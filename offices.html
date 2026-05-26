@@ -13,6 +13,105 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <style>
+    /* ── Interactive World Map (offices page) ─────────────────── */
+    .offices-map-container {
+      width: 100%; height: 560px;
+      border-radius: 16px; overflow: hidden;
+      box-shadow: 0 8px 48px rgba(0,0,0,0.14);
+      border: 1px solid var(--border);
+    }
+    .map-stats-bar {
+      display: flex; align-items: center; justify-content: center;
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.25rem 2rem;
+      margin: 0 auto 2rem; max-width: 480px; box-shadow: var(--shadow);
+    }
+    .map-stat-item { display: flex; flex-direction: column; align-items: center; flex: 1; }
+    .map-stat-num {
+      font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem;
+      color: var(--red); line-height: 1; letter-spacing: 0.04em;
+    }
+    .map-stat-label {
+      font-size: 0.7rem; color: var(--gray); font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.1em; margin-top: 0.2rem;
+    }
+    .map-stat-sep { width: 1px; height: 36px; background: var(--border); margin: 0 1.5rem; }
+    .map-legend-bar {
+      display: flex; align-items: center; justify-content: center;
+      flex-wrap: wrap; gap: 0.5rem 1.75rem; margin-bottom: 1.5rem;
+    }
+    .map-legend-item {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-size: 0.8rem; color: var(--charcoal); font-weight: 500;
+    }
+    .map-legend-dot {
+      display: inline-block; width: 10px; height: 10px;
+      border-radius: 50%; flex-shrink: 0;
+    }
+    .map-hint {
+      text-align: center; font-size: 0.75rem; color: var(--gray-light);
+      margin-top: 0.75rem; font-style: italic;
+    }
+
+    /* Leaflet overrides */
+    .leaflet-container { font-family: 'Outfit', sans-serif; background: #e8ecf0; }
+    .map-custom-tooltip {
+      background: #1a1a1a !important; border: none !important;
+      border-radius: 10px !important; box-shadow: 0 6px 24px rgba(0,0,0,0.35) !important;
+      padding: 0 !important; white-space: nowrap;
+    }
+    .map-custom-tooltip::before { border-top-color: #1a1a1a !important; }
+    .map-tt { padding: 0.65rem 1rem; text-align: center; }
+    .tt-iata {
+      display: block; font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem; color: #fff; letter-spacing: 0.12em; line-height: 1.1;
+    }
+    .tt-city { display: block; font-size: 0.75rem; color: rgba(255,255,255,0.72); }
+    .tt-region {
+      display: inline-block; font-size: 0.65rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      padding: 0.15rem 0.55rem; border-radius: 100px; margin-top: 0.45rem;
+    }
+
+    /* Pin markers */
+    .map-pin {
+      border-radius: 50%; border: 2.5px solid rgba(255,255,255,0.9);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.28);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
+      position: relative; overflow: visible;
+    }
+    .map-pin:hover { transform: scale(1.3) !important; box-shadow: 0 5px 20px rgba(0,0,0,0.4); }
+    .pin-label {
+      font-family: 'Bebas Neue', sans-serif; color: white;
+      letter-spacing: 0.04em; line-height: 1;
+      position: relative; z-index: 2; user-select: none;
+    }
+    /* Pulsing ring for HQ pin */
+    .pin-pulse {
+      position: absolute; inset: -7px; border-radius: 50%;
+      border: 2.5px solid #C8102E; pointer-events: none; z-index: 1;
+      animation: pin-pulse-ring 2s ease-out infinite;
+    }
+    .pin-pulse::after {
+      content: ''; position: absolute; inset: -7px; border-radius: 50%;
+      border: 2px solid #C8102E;
+      animation: pin-pulse-ring 2s ease-out 0.75s infinite;
+    }
+    @keyframes pin-pulse-ring {
+      0%   { transform: scale(1); opacity: 0.85; }
+      100% { transform: scale(2.1); opacity: 0; }
+    }
+
+    @media (max-width: 768px) {
+      .offices-map-container { height: 380px; }
+      .map-stats-bar { max-width: 100%; padding: 1rem 1.25rem; }
+      .map-stat-sep { margin: 0 0.75rem; }
+      .map-legend-bar { gap: 0.4rem 1rem; font-size: 0.72rem; }
+    }
+  </style>
 </head>
 <body>
 
@@ -124,8 +223,8 @@
     </div>
   </section>
 
-  <!-- Kales Global Network -->
-  <section class="offices-section">
+  <!-- Kales Global Network — Interactive World Map -->
+  <section class="offices-section" id="kales-network">
     <div class="container">
       <div class="section-header">
         <div class="section-tag">Kales Group Global Network</div>
@@ -133,56 +232,37 @@
         <p class="section-desc">As a Kales Group partner, Starlight Express connects Nepal to one of the world's most extensive air cargo GSSA networks — with offices in key trade hubs across Asia, Europe, the Americas, the Middle East, and Africa.</p>
       </div>
 
-      <h3 class="offices-region-title">South &amp; Central Asia</h3>
-      <div class="offices-grid">
-        <div class="office-card featured"><span class="office-iata">KTM</span><span class="office-name">Kathmandu, Nepal</span></div>
-        <div class="office-card"><span class="office-iata">DEL</span><span class="office-name">New Delhi, India</span></div>
-        <div class="office-card"><span class="office-iata">BLR</span><span class="office-name">Bengaluru, India</span></div>
-        <div class="office-card"><span class="office-iata">MAA</span><span class="office-name">Chennai, India</span></div>
-        <div class="office-card"><span class="office-iata">CCU</span><span class="office-name">Kolkata, India</span></div>
-        <div class="office-card"><span class="office-iata">HYD</span><span class="office-name">Hyderabad, India</span></div>
-        <div class="office-card"><span class="office-iata">AMD</span><span class="office-name">Ahmedabad, India</span></div>
-        <div class="office-card"><span class="office-iata">PNQ</span><span class="office-name">Pune, India</span></div>
-        <div class="office-card"><span class="office-iata">COK</span><span class="office-name">Kochi, India</span></div>
-        <div class="office-card"><span class="office-iata">CCJ</span><span class="office-name">Calicut, India</span></div>
-        <div class="office-card"><span class="office-iata">TRV</span><span class="office-name">Trivandrum, India</span></div>
-        <div class="office-card"><span class="office-iata">NAG</span><span class="office-name">Nagpur, India</span></div>
-        <div class="office-card"><span class="office-iata">JAI</span><span class="office-name">Jaipur, India</span></div>
-        <div class="office-card"><span class="office-iata">ALA</span><span class="office-name">Almaty, Kazakhstan</span></div>
+      <!-- Stats bar -->
+      <div class="map-stats-bar">
+        <div class="map-stat-item">
+          <span class="map-stat-num">31</span>
+          <span class="map-stat-label">Offices</span>
+        </div>
+        <div class="map-stat-sep"></div>
+        <div class="map-stat-item">
+          <span class="map-stat-num">5</span>
+          <span class="map-stat-label">Regions</span>
+        </div>
+        <div class="map-stat-sep"></div>
+        <div class="map-stat-item">
+          <span class="map-stat-num">20+</span>
+          <span class="map-stat-label">Countries</span>
+        </div>
       </div>
 
-      <h3 class="offices-region-title">East &amp; Southeast Asia</h3>
-      <div class="offices-grid">
-        <div class="office-card"><span class="office-iata">HKG</span><span class="office-name">Hong Kong</span></div>
+      <!-- Region legend -->
+      <div class="map-legend-bar">
+        <span class="map-legend-item"><span class="map-legend-dot" data-region="hq"></span>Headquarters (KTM)</span>
+        <span class="map-legend-item"><span class="map-legend-dot" data-region="asia"></span>South &amp; Central Asia</span>
+        <span class="map-legend-item"><span class="map-legend-dot" data-region="east-asia"></span>East &amp; SE Asia</span>
+        <span class="map-legend-item"><span class="map-legend-dot" data-region="europe"></span>Europe</span>
+        <span class="map-legend-item"><span class="map-legend-dot" data-region="north-america"></span>North America</span>
+        <span class="map-legend-item"><span class="map-legend-dot" data-region="latam"></span>Latin America</span>
       </div>
 
-      <h3 class="offices-region-title">Europe</h3>
-      <div class="offices-grid">
-        <div class="office-card"><span class="office-iata">IST</span><span class="office-name">Istanbul, Türkiye</span></div>
-        <div class="office-card"><span class="office-iata">ESB</span><span class="office-name">Ankara, Türkiye</span></div>
-        <div class="office-card"><span class="office-iata">ADA</span><span class="office-name">Adana, Türkiye</span></div>
-        <div class="office-card"><span class="office-iata">SOF</span><span class="office-name">Sofia, Bulgaria</span></div>
-        <div class="office-card"><span class="office-iata">TLL</span><span class="office-name">Tallinn, Estonia</span></div>
-      </div>
-
-      <h3 class="offices-region-title">North America</h3>
-      <div class="offices-grid">
-        <div class="office-card"><span class="office-iata">JFK</span><span class="office-name">New York, USA</span></div>
-        <div class="office-card"><span class="office-iata">IAD</span><span class="office-name">Washington, USA</span></div>
-        <div class="office-card"><span class="office-iata">DFW</span><span class="office-name">Dallas, USA</span></div>
-        <div class="office-card"><span class="office-iata">IAH</span><span class="office-name">Houston, USA</span></div>
-        <div class="office-card"><span class="office-iata">MIA</span><span class="office-name">Miami, USA</span></div>
-        <div class="office-card"><span class="office-iata">YUL</span><span class="office-name">Montreal, Canada</span></div>
-        <div class="office-card"><span class="office-iata">YVR</span><span class="office-name">Vancouver, Canada</span></div>
-      </div>
-
-      <h3 class="offices-region-title">Latin America</h3>
-      <div class="offices-grid">
-        <div class="office-card"><span class="office-iata">MEX</span><span class="office-name">Mexico City, Mexico</span></div>
-        <div class="office-card"><span class="office-iata">GUA</span><span class="office-name">Guatemala City, Guatemala</span></div>
-        <div class="office-card"><span class="office-iata">PTY</span><span class="office-name">Panama City, Panama</span></div>
-        <div class="office-card"><span class="office-iata">SJO</span><span class="office-name">San José, Costa Rica</span></div>
-      </div>
+      <!-- Map -->
+      <div id="offices-map" class="offices-map-container"></div>
+      <p class="map-hint">Hover a pin for details &nbsp;·&nbsp; Scroll / pinch to zoom &nbsp;·&nbsp; Click &amp; drag to pan</p>
 
       <div style="text-align:center; margin-top:3rem;">
         <a href="https://kales.com/" target="_blank" rel="noopener" class="btn btn-outline">View Full Kales Network ↗</a>
@@ -311,6 +391,150 @@
     </div>
   </div>
 
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN/WLI=" crossorigin=""></script>
+  <script>
+  (function () {
+    if (!document.getElementById('offices-map')) return;
+
+    var COLORS = {
+      'hq':            '#C8102E',
+      'asia':          '#f97316',
+      'east-asia':     '#3b82f6',
+      'europe':        '#8b5cf6',
+      'north-america': '#0ea5e9',
+      'latam':         '#10b981'
+    };
+
+    var REGION_NAMES = {
+      'hq':            'Headquarters',
+      'asia':          'South & Central Asia',
+      'east-asia':     'East & SE Asia',
+      'europe':        'Europe',
+      'north-america': 'North America',
+      'latam':         'Latin America'
+    };
+
+    var offices = [
+      // Headquarters
+      { iata:'KTM', city:'Kathmandu, Nepal',          lat:27.6984,  lng:85.3592,   region:'hq'            },
+      // South & Central Asia
+      { iata:'DEL', city:'New Delhi, India',           lat:28.5562,  lng:77.1003,   region:'asia'          },
+      { iata:'BLR', city:'Bengaluru, India',           lat:13.1994,  lng:77.7101,   region:'asia'          },
+      { iata:'MAA', city:'Chennai, India',             lat:12.9940,  lng:80.1692,   region:'asia'          },
+      { iata:'CCU', city:'Kolkata, India',             lat:22.6537,  lng:88.4467,   region:'asia'          },
+      { iata:'HYD', city:'Hyderabad, India',           lat:17.3727,  lng:78.4695,   region:'asia'          },
+      { iata:'AMD', city:'Ahmedabad, India',           lat:23.0746,  lng:72.6314,   region:'asia'          },
+      { iata:'PNQ', city:'Pune, India',                lat:18.5898,  lng:73.9129,   region:'asia'          },
+      { iata:'COK', city:'Kochi, India',               lat:10.1557,  lng:76.2180,   region:'asia'          },
+      { iata:'CCJ', city:'Calicut, India',             lat:11.1355,  lng:75.9532,   region:'asia'          },
+      { iata:'TRV', city:'Trivandrum, India',          lat:8.4760,   lng:76.9187,   region:'asia'          },
+      { iata:'NAG', city:'Nagpur, India',              lat:21.0922,  lng:79.0472,   region:'asia'          },
+      { iata:'JAI', city:'Jaipur, India',              lat:26.8242,  lng:75.8122,   region:'asia'          },
+      { iata:'ALA', city:'Almaty, Kazakhstan',         lat:43.3512,  lng:77.0377,   region:'asia'          },
+      // East & Southeast Asia
+      { iata:'HKG', city:'Hong Kong',                  lat:22.3080,  lng:113.9185,  region:'east-asia'     },
+      // Europe
+      { iata:'IST', city:'Istanbul, Türkiye',          lat:41.2749,  lng:28.7321,   region:'europe'        },
+      { iata:'ESB', city:'Ankara, Türkiye',            lat:40.1281,  lng:32.9951,   region:'europe'        },
+      { iata:'ADA', city:'Adana, Türkiye',             lat:36.9758,  lng:35.2748,   region:'europe'        },
+      { iata:'SOF', city:'Sofia, Bulgaria',            lat:42.6977,  lng:23.4104,   region:'europe'        },
+      { iata:'TLL', city:'Tallinn, Estonia',           lat:59.4133,  lng:24.8328,   region:'europe'        },
+      // North America
+      { iata:'JFK', city:'New York, USA',              lat:40.6413,  lng:-73.7781,  region:'north-america' },
+      { iata:'IAD', city:'Washington D.C., USA',       lat:38.8951,  lng:-77.0369,  region:'north-america' },
+      { iata:'DFW', city:'Dallas, USA',                lat:32.8975,  lng:-97.0381,  region:'north-america' },
+      { iata:'IAH', city:'Houston, USA',               lat:29.9844,  lng:-95.3677,  region:'north-america' },
+      { iata:'MIA', city:'Miami, USA',                 lat:25.7959,  lng:-80.2870,  region:'north-america' },
+      { iata:'YUL', city:'Montreal, Canada',           lat:45.4655,  lng:-73.7581,  region:'north-america' },
+      { iata:'YVR', city:'Vancouver, Canada',          lat:49.1900,  lng:-123.1794, region:'north-america' },
+      // Latin America
+      { iata:'MEX', city:'Mexico City, Mexico',        lat:19.4361,  lng:-99.0722,  region:'latam'         },
+      { iata:'GUA', city:'Guatemala City, Guatemala',  lat:14.5765,  lng:-90.5230,  region:'latam'         },
+      { iata:'PTY', city:'Panama City, Panama',        lat:9.0695,   lng:-79.3835,  region:'latam'         },
+      { iata:'SJO', city:'San José, Costa Rica',       lat:9.9940,   lng:-84.2084,  region:'latam'         }
+    ];
+
+    // Colour legend dots
+    document.querySelectorAll('.map-legend-dot').forEach(function (dot) {
+      var r = dot.getAttribute('data-region');
+      if (!COLORS[r]) return;
+      dot.style.background = COLORS[r];
+      if (r === 'hq') {
+        dot.style.width  = '13px';
+        dot.style.height = '13px';
+        dot.style.boxShadow = '0 0 0 3px ' + COLORS[r] + '40';
+      }
+    });
+
+    // Initialise map
+    var map = L.map('offices-map', {
+      center: [28, 10],
+      zoom: 2,
+      scrollWheelZoom: false,   // don't hijack page scroll
+      zoomControl: false,
+      attributionControl: true,
+      minZoom: 1,
+      maxZoom: 12,
+      worldCopyJump: true
+    });
+
+    L.control.zoom({ position: 'topright' }).addTo(map);
+
+    // CartoDB Positron — clean minimal basemap, no API key required
+    L.tileLayer(
+      'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+      {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 20
+      }
+    ).addTo(map);
+
+    // Build and place markers
+    offices.forEach(function (o) {
+      var isHQ   = o.region === 'hq';
+      var color  = COLORS[o.region];
+      var size   = isHQ ? 46 : 30;
+      var fsize  = isHQ ?  9 :  7;
+
+      var html = '<div class="map-pin' + (isHQ ? ' map-pin-hq' : '') + '" '
+        + 'style="width:' + size + 'px;height:' + size + 'px;background:' + color + ';">'
+        + (isHQ ? '<div class="pin-pulse"></div>' : '')
+        + '<span class="pin-label" style="font-size:' + fsize + 'px;">' + o.iata + '</span>'
+        + '</div>';
+
+      var icon = L.divIcon({
+        className: '',
+        html: html,
+        iconSize:    [size, size],
+        iconAnchor:  [size / 2, size / 2],
+        tooltipAnchor: [0, -(size / 2 + 10)]
+      });
+
+      var marker = L.marker([o.lat, o.lng], { icon: icon, riseOnHover: true, riseOffset: 300 })
+        .addTo(map);
+
+      marker.bindTooltip(
+        '<div class="map-tt">'
+          + '<span class="tt-iata">' + o.iata + '</span>'
+          + '<span class="tt-city">' + o.city + '</span>'
+          + '<span class="tt-region" style="background:' + color + '22;color:' + color + ';">'
+            + REGION_NAMES[o.region]
+          + '</span>'
+        + '</div>',
+        {
+          className: 'map-custom-tooltip',
+          direction: 'top',
+          permanent: false
+        }
+      );
+    });
+
+    // Auto-fit to all markers
+    var bounds = L.latLngBounds(offices.map(function (o) { return [o.lat, o.lng]; }));
+    map.fitBounds(bounds, { padding: [48, 48], maxZoom: 3 });
+  })();
+  </script>
   <script src="js/main.js"></script>
 </body>
 </html>
