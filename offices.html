@@ -227,24 +227,24 @@
     <div class="container">
       <div class="section-header">
         <div class="section-tag">Kales Group Global Network</div>
-        <h2 class="section-title">50+ GSSA Offices Worldwide</h2>
-        <p class="section-desc">As a Kales Group partner, Starlight Express connects Nepal to one of the world's most extensive air cargo GSSA networks — with offices in key trade hubs across Asia, Europe, the Americas, the Middle East, and Africa.</p>
+        <h2 class="section-title">69 Offices Across 36 Countries</h2>
+        <p class="section-desc">As a Kales Group partner, Starlight Express connects Nepal to one of the world's most extensive air cargo GSSA networks — with 69 offices spanning Asia, Europe, North America, and Latin America.</p>
       </div>
 
       <!-- Stats bar -->
       <div class="map-stats-bar">
         <div class="map-stat-item">
-          <span class="map-stat-num">31</span>
+          <span class="map-stat-num">69</span>
           <span class="map-stat-label">Offices</span>
         </div>
         <div class="map-stat-sep"></div>
         <div class="map-stat-item">
-          <span class="map-stat-num">5</span>
+          <span class="map-stat-num">4</span>
           <span class="map-stat-label">Regions</span>
         </div>
         <div class="map-stat-sep"></div>
         <div class="map-stat-item">
-          <span class="map-stat-num">20+</span>
+          <span class="map-stat-num">36</span>
           <span class="map-stat-label">Countries</span>
         </div>
       </div>
@@ -414,43 +414,96 @@
     };
 
     var offices = [
-      // Headquarters
-      { iata:'KTM', city:'Kathmandu, Nepal',          lat:27.6984,  lng:85.3592,   region:'hq'            },
-      // South & Central Asia
-      { iata:'DEL', city:'New Delhi, India',           lat:28.5562,  lng:77.1003,   region:'asia'          },
-      { iata:'BLR', city:'Bengaluru, India',           lat:13.1994,  lng:77.7101,   region:'asia'          },
-      { iata:'MAA', city:'Chennai, India',             lat:12.9940,  lng:80.1692,   region:'asia'          },
-      { iata:'CCU', city:'Kolkata, India',             lat:22.6537,  lng:88.4467,   region:'asia'          },
-      { iata:'HYD', city:'Hyderabad, India',           lat:17.3727,  lng:78.4695,   region:'asia'          },
-      { iata:'AMD', city:'Ahmedabad, India',           lat:23.0746,  lng:72.6314,   region:'asia'          },
-      { iata:'PNQ', city:'Pune, India',                lat:18.5898,  lng:73.9129,   region:'asia'          },
-      { iata:'COK', city:'Kochi, India',               lat:10.1557,  lng:76.2180,   region:'asia'          },
-      { iata:'CCJ', city:'Calicut, India',             lat:11.1355,  lng:75.9532,   region:'asia'          },
-      { iata:'TRV', city:'Trivandrum, India',          lat:8.4760,   lng:76.9187,   region:'asia'          },
-      { iata:'NAG', city:'Nagpur, India',              lat:21.0922,  lng:79.0472,   region:'asia'          },
-      { iata:'JAI', city:'Jaipur, India',              lat:26.8242,  lng:75.8122,   region:'asia'          },
-      { iata:'ALA', city:'Almaty, Kazakhstan',         lat:43.3512,  lng:77.0377,   region:'asia'          },
-      // East & Southeast Asia
-      { iata:'HKG', city:'Hong Kong',                  lat:22.3080,  lng:113.9185,  region:'east-asia'     },
-      // Europe
-      { iata:'IST', city:'Istanbul, Türkiye',          lat:41.2749,  lng:28.7321,   region:'europe'        },
-      { iata:'ESB', city:'Ankara, Türkiye',            lat:40.1281,  lng:32.9951,   region:'europe'        },
-      { iata:'ADA', city:'Adana, Türkiye',             lat:36.9758,  lng:35.2748,   region:'europe'        },
-      { iata:'SOF', city:'Sofia, Bulgaria',            lat:42.6977,  lng:23.4104,   region:'europe'        },
-      { iata:'TLL', city:'Tallinn, Estonia',           lat:59.4133,  lng:24.8328,   region:'europe'        },
-      // North America
-      { iata:'JFK', city:'New York, USA',              lat:40.6413,  lng:-73.7781,  region:'north-america' },
-      { iata:'IAD', city:'Washington D.C., USA',       lat:38.8951,  lng:-77.0369,  region:'north-america' },
-      { iata:'DFW', city:'Dallas, USA',                lat:32.8975,  lng:-97.0381,  region:'north-america' },
-      { iata:'IAH', city:'Houston, USA',               lat:29.9844,  lng:-95.3677,  region:'north-america' },
-      { iata:'MIA', city:'Miami, USA',                 lat:25.7959,  lng:-80.2870,  region:'north-america' },
-      { iata:'YUL', city:'Montreal, Canada',           lat:45.4655,  lng:-73.7581,  region:'north-america' },
-      { iata:'YVR', city:'Vancouver, Canada',          lat:49.1900,  lng:-123.1794, region:'north-america' },
-      // Latin America
-      { iata:'MEX', city:'Mexico City, Mexico',        lat:19.4361,  lng:-99.0722,  region:'latam'         },
-      { iata:'GUA', city:'Guatemala City, Guatemala',  lat:14.5765,  lng:-90.5230,  region:'latam'         },
-      { iata:'PTY', city:'Panama City, Panama',        lat:9.0695,   lng:-79.3835,  region:'latam'         },
-      { iata:'SJO', city:'San José, Costa Rica',       lat:9.9940,   lng:-84.2084,  region:'latam'         }
+      // ── Headquarters ──────────────────────────────────────────────────
+      { iata:'KTM', city:'Kathmandu, Nepal',                lat: 27.6984,  lng:  85.3592,  region:'hq'            },
+
+      // ── South & Central Asia ──────────────────────────────────────────
+      { iata:'ALA', city:'Almaty, Kazakhstan',               lat: 43.3512,  lng:  77.0377,  region:'asia'          },
+      { iata:'DEL', city:'New Delhi, India',                 lat: 28.5562,  lng:  77.1003,  region:'asia'          },
+      { iata:'BOM', city:'Mumbai, India',                    lat: 19.0887,  lng:  72.8679,  region:'asia'          },
+      { iata:'AMD', city:'Ahmedabad, India',                 lat: 23.0746,  lng:  72.6314,  region:'asia'          },
+      { iata:'JAI', city:'Jaipur, India',                    lat: 26.8242,  lng:  75.8122,  region:'asia'          },
+      { iata:'NAG', city:'Nagpur, India',                    lat: 21.0922,  lng:  79.0472,  region:'asia'          },
+      { iata:'PNQ', city:'Pune, India',                      lat: 18.5898,  lng:  73.9129,  region:'asia'          },
+      { iata:'HYD', city:'Hyderabad, India',                 lat: 17.3727,  lng:  78.4695,  region:'asia'          },
+      { iata:'BLR', city:'Bengaluru, India',                 lat: 13.1994,  lng:  77.7101,  region:'asia'          },
+      { iata:'MAA', city:'Chennai, India',                   lat: 12.9940,  lng:  80.1692,  region:'asia'          },
+      { iata:'COK', city:'Kochi, India',                     lat: 10.1557,  lng:  76.2180,  region:'asia'          },
+      { iata:'CCJ', city:'Calicut, India',                   lat: 11.1355,  lng:  75.9532,  region:'asia'          },
+      { iata:'TRV', city:'Trivandrum, India',                lat:  8.4760,  lng:  76.9187,  region:'asia'          },
+      { iata:'CCU', city:'Kolkata, India',                   lat: 22.6537,  lng:  88.4467,  region:'asia'          },
+
+      // ── East & SE Asia ────────────────────────────────────────────────
+      { iata:'HKG', city:'Hong Kong',                        lat: 22.3080,  lng: 113.9185,  region:'east-asia'     },
+
+      // ── Europe ────────────────────────────────────────────────────────
+      // Turkey
+      { iata:'IST', city:'Istanbul, Turkey',                 lat: 41.2749,  lng:  28.7321,  region:'europe'        },
+      { iata:'ESB', city:'Ankara, Turkey',                   lat: 40.1281,  lng:  32.9951,  region:'europe'        },
+      { iata:'ADA', city:'Adana, Turkey',                    lat: 36.9758,  lng:  35.2748,  region:'europe'        },
+      // Baltics & Eastern Europe
+      { iata:'TLL', city:'Tallinn, Estonia',                 lat: 59.4133,  lng:  24.8328,  region:'europe'        },
+      { iata:'RIX', city:'Riga, Latvia',                     lat: 56.9236,  lng:  23.9711,  region:'europe'        },
+      { iata:'VNO', city:'Vilnius, Lithuania',               lat: 54.6341,  lng:  25.2858,  region:'europe'        },
+      { iata:'WAW', city:'Warsaw, Poland',                   lat: 52.1657,  lng:  20.9670,  region:'europe'        },
+      { iata:'SOF', city:'Sofia, Bulgaria',                  lat: 42.6977,  lng:  23.4104,  region:'europe'        },
+      { iata:'BUD', city:'Budapest, Hungary',                lat: 47.4354,  lng:  19.2610,  region:'europe'        },
+      { iata:'OTP', city:'Bucharest, Romania',               lat: 44.5722,  lng:  26.1022,  region:'europe'        },
+      { iata:'PRG', city:'Prague, Czech Republic',           lat: 50.1008,  lng:  14.2600,  region:'europe'        },
+      { iata:'VIE', city:'Vienna, Austria',                  lat: 48.1103,  lng:  16.5697,  region:'europe'        },
+      // Germany
+      { iata:'FRA', city:'Frankfurt, Germany',               lat: 50.0379,  lng:   8.5622,  region:'europe'        },
+      { iata:'MUC', city:'Munich, Germany',                  lat: 48.3537,  lng:  11.7860,  region:'europe'        },
+      { iata:'DUS', city:'Düsseldorf, Germany',              lat: 51.2895,  lng:   6.7668,  region:'europe'        },
+      // Benelux
+      { iata:'AMS', city:'Amsterdam (Cargo), Netherlands',   lat: 52.3220,  lng:   4.7730,  region:'europe'        },
+      { iata:'AMS', city:'Amsterdam (Pax GSA), Netherlands', lat: 52.3086,  lng:   4.7523,  region:'europe'        },
+      { iata:'BRU', city:'Brussels (Cargo), Belgium',        lat: 50.9010,  lng:   4.4844,  region:'europe'        },
+      { iata:'BRU', city:'Brussels (Pax GSA), Belgium',      lat: 50.8949,  lng:   4.4280,  region:'europe'        },
+      // France
+      { iata:'CDG', city:'Paris, France',                    lat: 49.0097,  lng:   2.5479,  region:'europe'        },
+      { iata:'LYS', city:'Lyon, France',                     lat: 45.7256,  lng:   5.0811,  region:'europe'        },
+      // Italy
+      { iata:'MXP', city:'Milan, Italy',                     lat: 45.6306,  lng:   8.7232,  region:'europe'        },
+      { iata:'FCO', city:'Rome, Italy',                      lat: 41.8003,  lng:  12.2389,  region:'europe'        },
+      // Iberia
+      { iata:'MAD', city:'Madrid, Spain',                    lat: 40.4936,  lng:  -3.5668,  region:'europe'        },
+      { iata:'BCN', city:'Barcelona, Spain',                 lat: 41.2974,  lng:   2.0833,  region:'europe'        },
+      // UK & Ireland
+      { iata:'LHR', city:'London Heathrow, UK',              lat: 51.4700,  lng:  -0.4543,  region:'europe'        },
+      { iata:'LGW', city:'London Gatwick, UK',               lat: 51.1537,  lng:  -0.1821,  region:'europe'        },
+      { iata:'TCM', city:'London TCM, UK',                   lat: 51.1620,  lng:  -0.1650,  region:'europe'        },
+      { iata:'MAN', city:'Manchester, UK',                   lat: 53.3588,  lng:  -2.2727,  region:'europe'        },
+      { iata:'DUB', city:'Dublin, Ireland',                  lat: 53.4264,  lng:  -6.2499,  region:'europe'        },
+      // Switzerland
+      { iata:'GVA', city:'Geneva, Switzerland',              lat: 46.2381,  lng:   6.1089,  region:'europe'        },
+      { iata:'ZRH', city:'Zürich, Switzerland',              lat: 47.4502,  lng:   8.5623,  region:'europe'        },
+      // Nordics
+      { iata:'ARN', city:'Stockholm, Sweden',                lat: 59.6519,  lng:  17.9186,  region:'europe'        },
+      { iata:'MMA', city:'Malmö, Sweden',                    lat: 55.5367,  lng:  13.3771,  region:'europe'        },
+      { iata:'OSL', city:'Oslo, Norway',                     lat: 59.9464,  lng:  10.6165,  region:'europe'        },
+      { iata:'HEL', city:'Helsinki, Finland',                lat: 60.3172,  lng:  24.9633,  region:'europe'        },
+      { iata:'CPH', city:'Copenhagen, Denmark',              lat: 55.6180,  lng:  12.6560,  region:'europe'        },
+      { iata:'BLL', city:'Billund, Denmark',                 lat: 55.7473,  lng:   9.1518,  region:'europe'        },
+
+      // ── North America ─────────────────────────────────────────────────
+      { iata:'JFK', city:'New York, USA',                    lat: 40.6413,  lng: -73.7781,  region:'north-america' },
+      { iata:'IAD', city:'Washington D.C., USA',             lat: 38.8951,  lng: -77.0369,  region:'north-america' },
+      { iata:'IAH', city:'Houston, USA',                     lat: 29.9844,  lng: -95.3677,  region:'north-america' },
+      { iata:'DFW', city:'Dallas, USA',                      lat: 32.8975,  lng: -97.0381,  region:'north-america' },
+      { iata:'MIA', city:'Miami, USA',                       lat: 25.7959,  lng: -80.2870,  region:'north-america' },
+      { iata:'YYZ', city:'Toronto, Canada',                  lat: 43.6777,  lng: -79.6248,  region:'north-america' },
+      { iata:'YUL', city:'Montreal, Canada',                 lat: 45.4655,  lng: -73.7581,  region:'north-america' },
+      { iata:'YVR', city:'Vancouver, Canada',                lat: 49.1900,  lng:-123.1794,  region:'north-america' },
+
+      // ── Latin America ─────────────────────────────────────────────────
+      { iata:'MEX', city:'Mexico City, Mexico',              lat: 19.4361,  lng: -99.0722,  region:'latam'         },
+      { iata:'GUA', city:'Guatemala City, Guatemala',        lat: 14.5765,  lng: -90.5230,  region:'latam'         },
+      { iata:'SAL', city:'San Salvador, El Salvador',        lat: 13.4409,  lng: -89.0558,  region:'latam'         },
+      { iata:'SJO', city:'San José, Costa Rica',             lat:  9.9940,  lng: -84.2084,  region:'latam'         },
+      { iata:'PTY', city:'Panama City, Panama',              lat:  9.0695,  lng: -79.3835,  region:'latam'         },
+      { iata:'BOG', city:'Bogotá, Colombia',                 lat:  4.7016,  lng: -74.1469,  region:'latam'         },
+      { iata:'UIO', city:'Quito, Ecuador',                   lat: -0.1807,  lng: -78.4678,  region:'latam'         }
     ];
 
     // Colour legend dots
