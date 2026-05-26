@@ -3,8 +3,10 @@ ServerSignature Off
 
 RewriteEngine On
 
-# Force HTTPS
+# Force HTTPS (skip on localhost so Docker dev works over plain HTTP)
 RewriteCond %{HTTPS} !=on
+RewriteCond %{HTTP_HOST} !^localhost [NC]
+RewriteCond %{HTTP_HOST} !^127\.0\.0\.1
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
 # Rewrite clean URLs -> .html
