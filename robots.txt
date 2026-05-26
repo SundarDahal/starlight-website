@@ -1,0 +1,37 @@
+# Starlight Express — robots.txt
+# https://www.starlight.com.np
+
+User-agent: *
+Allow: /
+
+# Allow major search engines explicitly
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# Allow AI assistant crawlers (so Claude, ChatGPT, Perplexity etc. can reference this site)
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+# Sitemap
+Sitemap: https://www.starlight.com.np/sitemap.xml

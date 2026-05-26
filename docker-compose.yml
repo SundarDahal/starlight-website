@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: starlight_web
+    ports:
+      - "9000:80"          # http://localhost:9000
+    volumes:
+      # Live-reload: mount site files so changes are reflected without rebuild
+      - .:/var/www/html
+    restart: unless-stopped
+    environment:
+      # Silence the Apache "ServerName" warning
+      APACHE_SERVER_NAME: localhost

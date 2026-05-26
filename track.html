@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Track Air Cargo Shipment | Starlight Express Nepal</title>
+  <meta name="description" content="Track your air cargo shipment with Starlight Express — real-time AWB tracking powered by CargoMIS. Nepal's leading GSSA cargo tracking." />
+  <link rel="canonical" href="https://www.starlight.com.np/track.html" />
+  <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="images/favicon-192.png" />
+  <link rel="apple-touch-icon" sizes="256x256" href="images/apple-touch-icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="container topbar-inner">
+      <div class="topbar-left">
+        <span>📍 G.P.O Box 12713, Kathmandu, Nepal</span>
+        <span>✉ nepal@starlightexp.com</span>
+      </div>
+      <div class="topbar-right">
+        <span>📞 +977-1-4155451</span>
+        <a href="https://kales.com/" target="_blank" rel="noopener" class="kales-badge">A Kales Group Partner</a>
+      </div>
+    </div>
+  </div>
+
+  <header class="navbar" id="navbar">
+    <div class="container nav-inner">
+      <a href="index.html" class="logo" aria-label="Starlight Express - Kales Group Home">
+        <img src="images/logo.png" srcset="images/logo.png 1x, images/logo@2x.png 2x" alt="Starlight Express - Kales Group" class="logo-img" />
+      </a>
+      <nav class="nav-links" id="navLinks">
+        <a href="index.html">Home</a>
+        <a href="about.html">About Us</a>
+        <a href="offices.html">Our Offices &amp; Network</a>
+        <a href="services.html">Services</a>
+        <a href="track.html" class="active">Track Shipment</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <a href="contact.html" class="btn btn-primary nav-cta">Contact Us</a>
+      <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+  </header>
+
+  <section class="page-hero">
+    <div class="container page-hero-content">
+      <div class="section-tag">Real-Time Tracking</div>
+      <h1>Track Your Air Cargo</h1>
+      <p>Live AWB tracking via CargoMIS — Nepal's industry-standard cargo management system</p>
+    </div>
+  </section>
+
+  <section class="track-section">
+    <div class="container">
+      <div class="track-box">
+        <h2>Air Waybill (AWB) Tracking</h2>
+        <p>Enter your AWB number to see real-time status. Accepted format: <code>131KTM-3571 9725</code> (IATA standard).</p>
+
+        <form class="track-box-form" id="trackPageForm" onsubmit="trackPageSubmit(event)">
+          <input
+            type="text"
+            id="pageTrackInput"
+            class="track-box-input"
+            placeholder="e.g. 131KTM-3571 9725"
+            aria-label="AWB Number"
+            autocomplete="off"
+          />
+          <button type="submit" class="btn btn-primary">Track</button>
+        </form>
+
+        <!-- Result rendered here by JS -->
+        <div id="trackResult"></div>
+
+        <!-- Iframe fallback (hidden until activated) -->
+        <div id="cargomisWrapper" style="display:none; margin-top:1rem;">
+          <iframe
+            id="cargomisFrame"
+            class="cargomis-frame"
+            title="CargoMIS Shipment Tracking"
+            loading="lazy"
+            allowfullscreen
+          ></iframe>
+        </div>
+
+        <div class="track-note">
+          Tracking data provided by
+          <a href="https://cargomis.net" target="_blank" rel="noopener">CargoMIS</a>.
+          For assistance, call
+          <a href="tel:+97714155451">+977-1-4155451</a> or email
+          <a href="mailto:nepal@starlightexp.com">nepal@starlightexp.com</a>.
+        </div>
+      </div>
+
+      <!-- Info cards -->
+      <div style="max-width:820px; margin: 4rem auto 0; display:grid; grid-template-columns:repeat(3,1fr); gap:1.25rem;">
+        <div class="gssa-card" style="text-align:center;">
+          <svg class="anim-icon anim-icon-lg" aria-hidden="true" style="margin: 0 auto 0.75rem;"><use href="images/icons.svg#icon-document"/></svg>
+          <h3>AWB Format</h3>
+          <p>Standard format is 3-digit prefix + station code + 8 digits, e.g. 131KTM-3571 3950</p>
+        </div>
+        <div class="gssa-card" style="text-align:center;">
+          <svg class="anim-icon anim-icon-lg" aria-hidden="true" style="margin: 0 auto 0.75rem;"><use href="images/icons.svg#icon-radar"/></svg>
+          <h3>Real-Time Status</h3>
+          <p>Tracking data updates in real-time as shipments move through the global cargo network</p>
+        </div>
+        <div class="gssa-card" style="text-align:center;">
+          <svg class="anim-icon anim-icon-lg" aria-hidden="true" style="margin: 0 auto 0.75rem;"><use href="images/icons.svg#icon-handshake"/></svg>
+          <h3>Need Help?</h3>
+          <p>Our cargo team is available during business hours for personalised assistance</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section" style="padding:4rem 0;">
+    <div class="container cta-inner">
+      <h2>Can't Find Your Shipment?</h2>
+      <p>Our cargo team is available during business hours to assist with tracking and shipment queries.</p>
+      <div class="cta-actions">
+        <a href="contact.html" class="btn btn-white btn-lg">Contact Cargo Team</a>
+        <a href="tel:+97714155451" class="btn btn-outline-white btn-lg">📞 Call Now</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo-wrap">
+          <img src="images/logo.png" srcset="images/logo.png 1x, images/logo@2x.png 2x" alt="Starlight Express - Kales Group" class="footer-logo-img" />
+        </div>
+        <p>Nepal's premier GSSA for international airline air cargo. ISO 9001:2015 certified. A proud partner of Kales Group. Established 1995.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <a href="index.html">Home</a>
+        <a href="about.html">About Us</a>
+        <a href="offices.html">Offices &amp; Network</a>
+        <a href="services.html">Our Services</a>
+        <a href="track.html">Track Shipment</a>
+        <a href="contact.html">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="#" data-reopen-cookies>Cookie Preferences</a>
+      </div>
+      <div class="footer-col">
+        <h4>Contact Us</h4>
+        <p>G.P.O Box 12713<br/>Kathmandu, Nepal</p>
+        <a href="tel:+97714155451">+977-1-4155451</a>
+        <a href="mailto:nepal@starlightexp.com">nepal@starlightexp.com</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container footer-bottom-inner">
+        <span>© 2025 Starlight Express Pvt. Ltd. All Rights Reserved.</span>
+        <span>ISO 9001:2015 Certified | Established 1995</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Cookie Consent -->
+  <div class="cookie-banner" id="cookieBanner" role="dialog" aria-labelledby="cookieBannerTitle" aria-describedby="cookieBannerDesc">
+    <h3 id="cookieBannerTitle">We value your privacy</h3>
+    <p id="cookieBannerDesc">We use cookies to make our site work and, with your consent, to analyze how it is used. You can accept all, reject non-essential, or customize your choice. See our <a href="privacy.html">Privacy Policy</a>.</p>
+    <div class="cookie-buttons">
+      <button type="button" id="cookieRejectAll" class="btn btn-outline">Reject all</button>
+      <button type="button" id="cookieCustomize" class="btn btn-outline">Customize</button>
+      <button type="button" id="cookieAcceptAll" class="btn btn-primary">Accept all</button>
+    </div>
+    <div class="cookie-preferences" id="cookiePreferences">
+      <div class="cookie-pref-item">
+        <div><label>Strictly Necessary</label><span>Required for the site to work. Always on.</span></div>
+        <button type="button" class="cookie-switch on disabled" aria-label="Strictly necessary cookies"></button>
+      </div>
+      <div class="cookie-pref-item">
+        <div><label>Analytics</label><span>Helps us understand how visitors use the site.</span></div>
+        <button type="button" class="cookie-switch" data-cookie="analytics" aria-label="Analytics cookies"></button>
+      </div>
+      <div class="cookie-pref-item">
+        <div><label>Marketing</label><span>Used to personalize ads or track campaigns.</span></div>
+        <button type="button" class="cookie-switch" data-cookie="marketing" aria-label="Marketing cookies"></button>
+      </div>
+      <button type="button" id="cookieSavePrefs" class="btn btn-primary" style="width:100%; margin-top:0.75rem;">Save preferences</button>
+    </div>
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

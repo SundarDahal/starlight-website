@@ -1,0 +1,18 @@
+# ── Windows / WSL metadata ────────────────────────────────────────────────────
+*:Zone.Identifier
+
+# ── OS noise ──────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Docker runtime ────────────────────────────────────────────────────────────
+# (docker-compose.yml and Dockerfile are intentionally committed)
+
+# ── IDE / editor ──────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ── PHP temp / uploads ────────────────────────────────────────────────────────
+/tmp/
