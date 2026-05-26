@@ -111,6 +111,35 @@
       .map-stat-sep { margin: 0 0.75rem; }
       .map-legend-bar { gap: 0.4rem 1rem; font-size: 0.72rem; }
     }
+
+    /* ── Click popup ─────────────────────────────────────────── */
+    .leaflet-popup-content-wrapper {
+      background: #1c1c1c !important; color: #fff;
+      border-radius: 14px !important;
+      box-shadow: 0 16px 52px rgba(0,0,0,0.55) !important;
+      border: none !important; padding: 0 !important; overflow: hidden;
+    }
+    .leaflet-popup-tip { background: #1c1c1c !important; }
+    .leaflet-popup-content { margin: 0 !important; min-width: 230px; max-width: 290px; line-height: 1; }
+    .leaflet-popup-close-button {
+      color: rgba(255,255,255,0.4) !important; font-size: 1.1rem !important;
+      top: 8px !important; right: 10px !important; padding: 0 !important;
+    }
+    .leaflet-popup-close-button:hover { color: #fff !important; background: none !important; }
+    .map-popup   { padding: 1.2rem 1.4rem 1.15rem; }
+    .pop-head    { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:0.5rem; gap:0.5rem; }
+    .pop-iata    { font-family:'Bebas Neue',sans-serif; font-size:1.75rem; color:#fff; letter-spacing:0.1em; line-height:1; }
+    .pop-badge   { font-size:0.57rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em;
+                   padding:0.2rem 0.55rem; border-radius:100px; align-self:flex-start; margin-top:0.3rem; white-space:nowrap; }
+    .pop-city    { font-size:0.84rem; color:rgba(255,255,255,0.8); margin-bottom:0.15rem; font-weight:500; }
+    .pop-entity  { font-size:0.7rem; color:rgba(255,255,255,0.38); font-style:italic; margin-bottom:0.75rem; }
+    .pop-sep     { height:1px; background:rgba(255,255,255,0.1); margin:0.55rem 0; }
+    .pop-row     { display:flex; align-items:flex-start; gap:0.5rem; font-size:0.77rem;
+                   color:rgba(255,255,255,0.75); margin-bottom:0.38rem; line-height:1.45; }
+    .pop-row:last-child { margin-bottom:0; }
+    .pop-ico     { flex-shrink:0; font-size:0.72rem; margin-top:0.12rem; opacity:0.5; width:14px; text-align:center; }
+    .pop-a       { color:#fb923c; text-decoration:none; word-break:break-all; }
+    .pop-a:hover { text-decoration:underline; color:#fdba74; }
   </style>
 </head>
 <body>
@@ -413,100 +442,336 @@
       'latam':         'Latin America'
     };
 
+    // ── Office data (sourced from company-data.json) ──────────────────────
+    // Fields: iata, city, lat, lng, region, entity, type, addr, phone, email
     var offices = [
-      // ── Headquarters ──────────────────────────────────────────────────
-      { iata:'KTM', city:'Kathmandu, Nepal',                lat: 27.6984,  lng:  85.3592,  region:'hq'            },
+      // ── Headquarters ─────────────────────────────────────────────────────
+      { iata:'KTM', city:'Kathmandu, Nepal',                lat: 27.6984, lng:  85.3592, region:'hq',
+        entity:'Starlight Express Pvt. Ltd.', type:'HQ',
+        addr:'Starlight Building, Sahayogi Nagar, Kathmandu',
+        phone:'+977-98510-24827', email:'info@starlightexp.com' },
 
-      // ── South & Central Asia ──────────────────────────────────────────
-      { iata:'ALA', city:'Almaty, Kazakhstan',               lat: 43.3512,  lng:  77.0377,  region:'asia'          },
-      { iata:'DEL', city:'New Delhi, India',                 lat: 28.5562,  lng:  77.1003,  region:'asia'          },
-      { iata:'BOM', city:'Mumbai, India',                    lat: 19.0887,  lng:  72.8679,  region:'asia'          },
-      { iata:'AMD', city:'Ahmedabad, India',                 lat: 23.0746,  lng:  72.6314,  region:'asia'          },
-      { iata:'JAI', city:'Jaipur, India',                    lat: 26.8242,  lng:  75.8122,  region:'asia'          },
-      { iata:'NAG', city:'Nagpur, India',                    lat: 21.0922,  lng:  79.0472,  region:'asia'          },
-      { iata:'PNQ', city:'Pune, India',                      lat: 18.5898,  lng:  73.9129,  region:'asia'          },
-      { iata:'HYD', city:'Hyderabad, India',                 lat: 17.3727,  lng:  78.4695,  region:'asia'          },
-      { iata:'BLR', city:'Bengaluru, India',                 lat: 13.1994,  lng:  77.7101,  region:'asia'          },
-      { iata:'MAA', city:'Chennai, India',                   lat: 12.9940,  lng:  80.1692,  region:'asia'          },
-      { iata:'COK', city:'Kochi, India',                     lat: 10.1557,  lng:  76.2180,  region:'asia'          },
-      { iata:'CCJ', city:'Calicut, India',                   lat: 11.1355,  lng:  75.9532,  region:'asia'          },
-      { iata:'TRV', city:'Trivandrum, India',                lat:  8.4760,  lng:  76.9187,  region:'asia'          },
-      { iata:'CCU', city:'Kolkata, India',                   lat: 22.6537,  lng:  88.4467,  region:'asia'          },
+      // ── South & Central Asia ─────────────────────────────────────────────
+      { iata:'ALA', city:'Almaty, Kazakhstan',              lat: 43.3512, lng:  77.0377, region:'asia',
+        entity:'Kales Airline Services', type:'GSSA',
+        addr:'Taugul microdistrict, bldg 53/6, Almaty 050000',
+        phone:'+7 771 769 9998', email:'raiymbek.amanzholov@kales.com' },
+      { iata:'DEL', city:'New Delhi, India',                lat: 28.5562, lng:  77.1003, region:'asia',
+        entity:'Allied Aviation Pvt. Ltd.', type:'GSSA',
+        addr:'Import-II Building, I.G.I. Cargo Complex, New Delhi 110037',
+        phone:null, email:'info@aaplindia.com' },
+      { iata:'BOM', city:'Mumbai, India',                   lat: 19.0887, lng:  72.8679, region:'asia',
+        entity:'Allied Aviation Pvt. Ltd.', type:'GSSA',
+        addr:'502 Solitaire Corporate Park, Andheri East, Mumbai 400093',
+        phone:null, email:'info@aaplindia.com' },
+      { iata:'AMD', city:'Ahmedabad, India',                lat: 23.0746, lng:  72.6314, region:'asia',
+        entity:'Allied Aviation Pvt. Ltd.', type:'GSSA',
+        addr:'2-A Agarwal Complex, C.G. Road, Ahmedabad 380009',
+        phone:null, email:'info@aaplindia.com' },
+      { iata:'JAI', city:'Jaipur, India',                   lat: 26.8242, lng:  75.8122, region:'asia',
+        entity:'Allied Aviation Pvt. Ltd.', type:'GSSA',
+        addr:'106 Hotel Basant, Opp. Airport Main Gate, Jaipur 302029',
+        phone:null, email:'info@aaplindia.com' },
+      { iata:'NAG', city:'Nagpur, India',                   lat: 21.0922, lng:  79.0472, region:'asia',
+        entity:'Allied Aviation Pvt. Ltd.', type:'GSSA',
+        addr:'Lokmat Bhawan, Ramdas Peth, Nagpur 440012',
+        phone:null, email:'info@aaplindia.com' },
+      { iata:'PNQ', city:'Pune, India',                     lat: 18.5898, lng:  73.9129, region:'asia',
+        entity:'Allied Aviation Pvt. Ltd.', type:'GSSA',
+        addr:'Behind Khadki Railway Station, Pune 411003',
+        phone:null, email:'info@aaplindia.com' },
+      { iata:'HYD', city:'Hyderabad, India',                lat: 17.3727, lng:  78.4695, region:'asia',
+        entity:'Allied Aviation Pvt. Ltd.', type:'GSSA',
+        addr:'HMACPL Building, Rajiv Gandhi Intl Airport, Telangana 501218',
+        phone:null, email:'info@aaplindia.com' },
+      { iata:'BLR', city:'Bengaluru, India',                lat: 13.1994, lng:  77.7101, region:'asia',
+        entity:'Allied Aviation Pvt. Ltd.', type:'GSSA',
+        addr:'No.12 9th A Cross, SR Nagar, Bengaluru 560027',
+        phone:null, email:'info@aaplindia.com' },
+      { iata:'MAA', city:'Chennai, India',                  lat: 12.9940, lng:  80.1692, region:'asia',
+        entity:'Allied Aviation Pvt. Ltd.', type:'GSSA',
+        addr:'501 Alonkar Anugraha Apartments, Chennai',
+        phone:null, email:'info@aaplindia.com' },
+      { iata:'COK', city:'Kochi, India',                    lat: 10.1557, lng:  76.2180, region:'asia',
+        entity:'Allied Aviation Pvt. Ltd.', type:'GSSA',
+        addr:'K.C. Jacob Building, VIP Road, Nedumbassery, Kochi 683572',
+        phone:null, email:'info@aaplindia.com' },
+      { iata:'CCJ', city:'Calicut, India',                  lat: 11.1355, lng:  75.9532, region:'asia',
+        entity:'Allied Aviation Pvt. Ltd.', type:'GSSA',
+        addr:'KSIE Admin Block, Calicut International Airport 673647',
+        phone:null, email:null },
+      { iata:'TRV', city:'Trivandrum, India',               lat:  8.4760, lng:  76.9187, region:'asia',
+        entity:'Allied Aviation Pvt. Ltd.', type:'GSSA',
+        addr:'Kalpaka Nagar, Chackai PO, Trivandrum 695024',
+        phone:null, email:'info@aaplindia.com' },
+      { iata:'CCU', city:'Kolkata, India',                  lat: 22.6537, lng:  88.4467, region:'asia',
+        entity:'Allied Aviation Pvt. Ltd.', type:'GSSA',
+        addr:'Landmark Building, 228 A.J.C Bose Road, Kolkata 700020',
+        phone:null, email:'info@aaplindia.com' },
 
-      // ── East & SE Asia ────────────────────────────────────────────────
-      { iata:'HKG', city:'Hong Kong',                        lat: 22.3080,  lng: 113.9185,  region:'east-asia'     },
+      // ── East & SE Asia ───────────────────────────────────────────────────
+      { iata:'HKG', city:'Hong Kong',                       lat: 22.3080, lng: 113.9185, region:'east-asia',
+        entity:'Kales Airline Services Limited', type:'GSSA',
+        addr:'Chung Nam Building, 1 Lockhart Road, Wanchai',
+        phone:null, email:'sales.hkg@kales.com' },
 
-      // ── Europe ────────────────────────────────────────────────────────
-      // Turkey
-      { iata:'IST', city:'Istanbul, Turkey',                 lat: 41.2749,  lng:  28.7321,  region:'europe'        },
-      { iata:'ESB', city:'Ankara, Turkey',                   lat: 40.1281,  lng:  32.9951,  region:'europe'        },
-      { iata:'ADA', city:'Adana, Turkey',                    lat: 36.9758,  lng:  35.2748,  region:'europe'        },
-      // Baltics & Eastern Europe
-      { iata:'TLL', city:'Tallinn, Estonia',                 lat: 59.4133,  lng:  24.8328,  region:'europe'        },
-      { iata:'RIX', city:'Riga, Latvia',                     lat: 56.9236,  lng:  23.9711,  region:'europe'        },
-      { iata:'VNO', city:'Vilnius, Lithuania',               lat: 54.6341,  lng:  25.2858,  region:'europe'        },
-      { iata:'WAW', city:'Warsaw, Poland',                   lat: 52.1657,  lng:  20.9670,  region:'europe'        },
-      { iata:'SOF', city:'Sofia, Bulgaria',                  lat: 42.6977,  lng:  23.4104,  region:'europe'        },
-      { iata:'BUD', city:'Budapest, Hungary',                lat: 47.4354,  lng:  19.2610,  region:'europe'        },
-      { iata:'OTP', city:'Bucharest, Romania',               lat: 44.5722,  lng:  26.1022,  region:'europe'        },
-      { iata:'PRG', city:'Prague, Czech Republic',           lat: 50.1008,  lng:  14.2600,  region:'europe'        },
-      { iata:'VIE', city:'Vienna, Austria',                  lat: 48.1103,  lng:  16.5697,  region:'europe'        },
-      // Germany
-      { iata:'FRA', city:'Frankfurt, Germany',               lat: 50.0379,  lng:   8.5622,  region:'europe'        },
-      { iata:'MUC', city:'Munich, Germany',                  lat: 48.3537,  lng:  11.7860,  region:'europe'        },
-      { iata:'DUS', city:'Düsseldorf, Germany',              lat: 51.2895,  lng:   6.7668,  region:'europe'        },
-      // Benelux
-      { iata:'AMS', city:'Amsterdam (Cargo), Netherlands',   lat: 52.3220,  lng:   4.7730,  region:'europe'        },
-      { iata:'AMS', city:'Amsterdam (Pax GSA), Netherlands', lat: 52.3086,  lng:   4.7523,  region:'europe'        },
-      { iata:'BRU', city:'Brussels (Cargo), Belgium',        lat: 50.9010,  lng:   4.4844,  region:'europe'        },
-      { iata:'BRU', city:'Brussels (Pax GSA), Belgium',      lat: 50.8949,  lng:   4.4280,  region:'europe'        },
-      // France
-      { iata:'CDG', city:'Paris, France',                    lat: 49.0097,  lng:   2.5479,  region:'europe'        },
-      { iata:'LYS', city:'Lyon, France',                     lat: 45.7256,  lng:   5.0811,  region:'europe'        },
-      // Italy
-      { iata:'MXP', city:'Milan, Italy',                     lat: 45.6306,  lng:   8.7232,  region:'europe'        },
-      { iata:'FCO', city:'Rome, Italy',                      lat: 41.8003,  lng:  12.2389,  region:'europe'        },
-      // Iberia
-      { iata:'MAD', city:'Madrid, Spain',                    lat: 40.4936,  lng:  -3.5668,  region:'europe'        },
-      { iata:'BCN', city:'Barcelona, Spain',                 lat: 41.2974,  lng:   2.0833,  region:'europe'        },
-      // UK & Ireland
-      { iata:'LHR', city:'London Heathrow, UK',              lat: 51.4700,  lng:  -0.4543,  region:'europe'        },
-      { iata:'LGW', city:'London Gatwick, UK',               lat: 51.1537,  lng:  -0.1821,  region:'europe'        },
-      { iata:'TCM', city:'London TCM, UK',                   lat: 51.1620,  lng:  -0.1650,  region:'europe'        },
-      { iata:'MAN', city:'Manchester, UK',                   lat: 53.3588,  lng:  -2.2727,  region:'europe'        },
-      { iata:'DUB', city:'Dublin, Ireland',                  lat: 53.4264,  lng:  -6.2499,  region:'europe'        },
-      // Switzerland
-      { iata:'GVA', city:'Geneva, Switzerland',              lat: 46.2381,  lng:   6.1089,  region:'europe'        },
-      { iata:'ZRH', city:'Zürich, Switzerland',              lat: 47.4502,  lng:   8.5623,  region:'europe'        },
-      // Nordics
-      { iata:'ARN', city:'Stockholm, Sweden',                lat: 59.6519,  lng:  17.9186,  region:'europe'        },
-      { iata:'MMA', city:'Malmö, Sweden',                    lat: 55.5367,  lng:  13.3771,  region:'europe'        },
-      { iata:'OSL', city:'Oslo, Norway',                     lat: 59.9464,  lng:  10.6165,  region:'europe'        },
-      { iata:'HEL', city:'Helsinki, Finland',                lat: 60.3172,  lng:  24.9633,  region:'europe'        },
-      { iata:'CPH', city:'Copenhagen, Denmark',              lat: 55.6180,  lng:  12.6560,  region:'europe'        },
-      { iata:'BLL', city:'Billund, Denmark',                 lat: 55.7473,  lng:   9.1518,  region:'europe'        },
+      // ── Europe — Turkey ──────────────────────────────────────────────────
+      { iata:'IST', city:'Istanbul, Turkey',                lat: 41.2749, lng:  28.7321, region:'europe',
+        entity:'Kales Airline Services Tasimacilik Ltd.', type:'GSSA',
+        addr:'Burcistanbul Plaza, 20th Floor, Esenyurt 34522, Istanbul',
+        phone:'+90 212 924 39 13', email:'cargosales.tr@kales.com' },
+      { iata:'ESB', city:'Ankara, Turkey',                  lat: 40.1281, lng:  32.9951, region:'europe',
+        entity:'Kales Airline Services Tasimacilik Ltd.', type:'GSSA',
+        addr:'Sair Nazim CD. No3/38, Cankaya, Ankara',
+        phone:'+905058015683', email:'cargosales.tr@kales.com' },
+      { iata:'ADA', city:'Adana, Turkey',                   lat: 36.9758, lng:  35.2748, region:'europe',
+        entity:'Kales Airline Services Tasimacilik Ltd.', type:'GSSA',
+        addr:'Sunar Nuri Comu Is Merkezi, Seyhan, Adana',
+        phone:'+90 3229994744', email:'info@kales.com' },
 
-      // ── North America ─────────────────────────────────────────────────
-      { iata:'JFK', city:'New York, USA',                    lat: 40.6413,  lng: -73.7781,  region:'north-america' },
-      { iata:'IAD', city:'Washington D.C., USA',             lat: 38.8951,  lng: -77.0369,  region:'north-america' },
-      { iata:'IAH', city:'Houston, USA',                     lat: 29.9844,  lng: -95.3677,  region:'north-america' },
-      { iata:'DFW', city:'Dallas, USA',                      lat: 32.8975,  lng: -97.0381,  region:'north-america' },
-      { iata:'MIA', city:'Miami, USA',                       lat: 25.7959,  lng: -80.2870,  region:'north-america' },
-      { iata:'YYZ', city:'Toronto, Canada',                  lat: 43.6777,  lng: -79.6248,  region:'north-america' },
-      { iata:'YUL', city:'Montreal, Canada',                 lat: 45.4655,  lng: -73.7581,  region:'north-america' },
-      { iata:'YVR', city:'Vancouver, Canada',                lat: 49.1900,  lng:-123.1794,  region:'north-america' },
+      // ── Europe — Baltics & Eastern Europe ────────────────────────────────
+      { iata:'TLL', city:'Tallinn, Estonia',                lat: 59.4133, lng:  24.8328, region:'europe',
+        entity:'Kales Airline Services OÜ', type:'GSSA',
+        addr:'Rodunios Kelias 18, 02188 Vilnius (Baltic hub)',
+        phone:'+370 52306089', email:'kales.baltic@kales.com' },
+      { iata:'RIX', city:'Riga, Latvia',                    lat: 56.9236, lng:  23.9711, region:'europe',
+        entity:'Kales Airline Services SIA', type:'GSSA',
+        addr:'Rodunios Kelias 18, 02188 Vilnius (Baltic hub)',
+        phone:'+370 5 2306089', email:'kales.baltic@kales.com' },
+      { iata:'VNO', city:'Vilnius, Lithuania',              lat: 54.6341, lng:  25.2858, region:'europe',
+        entity:'Kales Airline Services UAB', type:'GSSA',
+        addr:'Rodunios Kelias 18, 02188 Vilnius',
+        phone:'+370 5 2306089', email:'kales.baltic@kales.com' },
+      { iata:'WAW', city:'Warsaw, Poland',                  lat: 52.1657, lng:  20.9670, region:'europe',
+        entity:'Kales Airline Services Sp. z.o.o.', type:'GSSA',
+        addr:'ul. Poleczki 23, Platan Park II G, 02-822 Warsaw',
+        phone:'+48 22 335 2050', email:'info.waw@kales.com' },
+      { iata:'SOF', city:'Sofia, Bulgaria',                 lat: 42.6977, lng:  23.4104, region:'europe',
+        entity:'Kales Airline Services', type:'GSSA',
+        addr:'Sofia Airport Center, 64 Christopher Columbus Blvd, 1592 Sofia',
+        phone:'+359 2 483 3008', email:null },
+      { iata:'BUD', city:'Budapest, Hungary',               lat: 47.4354, lng:  19.2610, region:'europe',
+        entity:'Kales Airline Services Kft.', type:'GSSA',
+        addr:'Cargo City 325, 2220 Vecsés (Budapest Airport)',
+        phone:'+36 1 291 8232', email:'info.bud@kales.com' },
+      { iata:'OTP', city:'Bucharest, Romania',              lat: 44.5722, lng:  26.1022, region:'europe',
+        entity:'Kales Airline Services S.r.l.', type:'GSSA',
+        addr:'Calea Bucurestilor 224E, Otopeni 075100',
+        phone:'+40 730 102 704', email:'nicoleta.mosoia@kales.com' },
+      { iata:'PRG', city:'Prague, Czech Republic',          lat: 50.1008, lng:  14.2600, region:'europe',
+        entity:'Kales Airline Services s.r.o.', type:'GSSA',
+        addr:'Laglerove 4/1075, Skyport Cargo Terminal, CZ-16100 Prague',
+        phone:'+420 22011 5016', email:'info.prg@kales.com' },
+      { iata:'VIE', city:'Vienna, Austria',                 lat: 48.1103, lng:  16.5697, region:'europe',
+        entity:'Kales Airline Services GmbH', type:'GSSA',
+        addr:'Objekt 263, Stiege 3, 1300 Vienna Airport',
+        phone:'+43 1 7007 35181', email:'info.vie@kales.com' },
 
-      // ── Latin America ─────────────────────────────────────────────────
-      { iata:'MEX', city:'Mexico City, Mexico',              lat: 19.4361,  lng: -99.0722,  region:'latam'         },
-      { iata:'GUA', city:'Guatemala City, Guatemala',        lat: 14.5765,  lng: -90.5230,  region:'latam'         },
-      { iata:'SAL', city:'San Salvador, El Salvador',        lat: 13.4409,  lng: -89.0558,  region:'latam'         },
-      { iata:'SJO', city:'San José, Costa Rica',             lat:  9.9940,  lng: -84.2084,  region:'latam'         },
-      { iata:'PTY', city:'Panama City, Panama',              lat:  9.0695,  lng: -79.3835,  region:'latam'         },
-      { iata:'BOG', city:'Bogotá, Colombia',                 lat:  4.7016,  lng: -74.1469,  region:'latam'         },
-      { iata:'UIO', city:'Quito, Ecuador',                   lat: -0.1807,  lng: -78.4678,  region:'latam'         }
+      // ── Europe — Germany ─────────────────────────────────────────────────
+      { iata:'FRA', city:'Frankfurt, Germany',              lat: 50.0379, lng:   8.5622, region:'europe',
+        entity:'Kales Airline Services GmbH', type:'GSSA',
+        addr:'Cargo City South, Bldg. 641, 60549 Frankfurt Airport',
+        phone:'+49 69-2474851-200', email:'info.de@kales.com' },
+      { iata:'MUC', city:'Munich, Germany',                 lat: 48.3537, lng:  11.7860, region:'europe',
+        entity:'Kales Airline Services GmbH', type:'GSSA',
+        addr:'Zur Niedermuhle 9, 85435 Erding (Munich)',
+        phone:'+49 69 2474851 200', email:'info.de@kales.com' },
+      { iata:'DUS', city:'Düsseldorf, Germany',             lat: 51.2895, lng:   6.7668, region:'europe',
+        entity:'Kales Airline Services GmbH', type:'GSSA',
+        addr:'Kales Airline Services GmbH, Düsseldorf',
+        phone:'+49 69 2474851 200', email:'sales.de@kales.com' },
+
+      // ── Europe — Benelux ─────────────────────────────────────────────────
+      { iata:'AMS', city:'Amsterdam (Cargo), Netherlands',  lat: 52.3220, lng:   4.7730, region:'europe',
+        entity:'Kales Airline Services B.V.', type:'GSSA',
+        addr:'Anchoragelaan 30, 1118 LD Schiphol',
+        phone:'+31 20 655 3610', email:'sales.spl@kales.com' },
+      { iata:'AMS', city:'Amsterdam (Pax GSA), Netherlands',lat: 52.3086, lng:   4.7523, region:'europe',
+        entity:'Kales Airline Services B.V.', type:'Pax GSA',
+        addr:'The Base A 7th Floor, Evert v/d Beekstraat 1-46, Schiphol',
+        phone:'+31 20 655 3650', email:'airlines.nl@kales.com' },
+      { iata:'BRU', city:'Brussels (Cargo), Belgium',       lat: 50.9010, lng:   4.4844, region:'europe',
+        entity:'Kales Airline Services B.V.', type:'GSSA',
+        addr:'Building 703, Bedrijvenzone Cargo Machelen 703, Brucargo',
+        phone:'+32 2 305 28 20', email:'sales.bru@kales.com' },
+      { iata:'BRU', city:'Brussels (Pax GSA), Belgium',     lat: 50.8949, lng:   4.4280, region:'europe',
+        entity:'Kales Airline Services B.V.', type:'Pax GSA',
+        addr:'Park Hill, Mommaertslaan 18 B, 1831 Diegem-Brussels',
+        phone:'+32 2 716 0070', email:'pax.be@kales.com' },
+
+      // ── Europe — France ──────────────────────────────────────────────────
+      { iata:'CDG', city:'Paris, France',                   lat: 49.0097, lng:   2.5479, region:'europe',
+        entity:'Kales Airline Services Sarl', type:'GSSA',
+        addr:'10 Rue du Pavé, 93290 Tremblay-en-France (CDG)',
+        phone:'+33 1 4862 5349', email:'info.fr@kales.com' },
+      { iata:'LYS', city:'Lyon, France',                    lat: 45.7256, lng:   5.0811, region:'europe',
+        entity:'Kales Airline Services Sarl', type:'GSSA',
+        addr:'Cargo Port, B.P. 354, 69125 Lyon St. Exupery Airport',
+        phone:'+33 4 72 22 53 56', email:'info.lys@kales.com' },
+
+      // ── Europe — Italy ───────────────────────────────────────────────────
+      { iata:'MXP', city:'Milan, Italy',                    lat: 45.6306, lng:   8.7232, region:'europe',
+        entity:'Kales Airline Services S.r.l.', type:'GSSA',
+        addr:'Via Dante 146, 20096 Limito di Pioltello, Milan',
+        phone:'+39 02 9216 7000', email:'info.mil@kales.com' },
+      { iata:'FCO', city:'Rome, Italy',                     lat: 41.8003, lng:  12.2389, region:'europe',
+        entity:'Kales Airline Services S.r.l.', type:'GSSA',
+        addr:'Cargo City, Via M.Castoldi snc, Aeroporto Fiumicino, Rome',
+        phone:'+39 06 65954017', email:'info.rom@kales.com' },
+
+      // ── Europe — Iberia ──────────────────────────────────────────────────
+      { iata:'MAD', city:'Madrid, Spain',                   lat: 40.4936, lng:  -3.5668, region:'europe',
+        entity:'Kales Airline Services SL', type:'GSSA',
+        addr:'Centro de Carga Aerea, Edf. Servicios Generales ofc.201, Madrid',
+        phone:'+34 91 748 27 25', email:'info.es@kales.com' },
+      { iata:'BCN', city:'Barcelona, Spain',                lat: 41.2974, lng:   2.0833, region:'europe',
+        entity:'Kales Airline Services SL', type:'GSSA',
+        addr:'Business Park Mas Blau 2, El Prat de Llobregat, Barcelona',
+        phone:'+34 933 788 770', email:'info.es@kales.com' },
+
+      // ── Europe — UK & Ireland ────────────────────────────────────────────
+      { iata:'LHR', city:'London Heathrow, UK',             lat: 51.4700, lng:  -0.4543, region:'europe',
+        entity:'Wexco Airfreight U.K. Ltd.', type:'GSSA',
+        addr:'Lancaster House, Northumberland Close, Stanwell TW19 7LN',
+        phone:'+44 203 876 1717', email:'sales@gsawexco.com' },
+      { iata:'LGW', city:'London Gatwick, UK',              lat: 51.1537, lng:  -0.1821, region:'europe',
+        entity:'Wexco Airfreight U.K. Ltd.', type:'GSSA',
+        addr:'Timberham House, Gatwick World Cargo Center, RH6 0EY',
+        phone:'+44 203 876 1717', email:'sales@gsawexco.com' },
+      { iata:'TCM', city:'London TCM, UK',                  lat: 51.1620, lng:  -0.1650, region:'europe',
+        entity:'Kales Airline Services', type:'TCM',
+        addr:'Timberham House, Gatwick World Cargo Center, RH6 0EY',
+        phone:'+31 20 655 3630', email:'tcm@kales.com' },
+      { iata:'MAN', city:'Manchester, UK',                  lat: 53.3588, lng:  -2.2727, region:'europe',
+        entity:'Wexco Airfreight U.K. Ltd.', type:'GSSA',
+        addr:'dnata City North, 2 Pinfold Lane, Manchester Airport M90 5YF',
+        phone:'+44 202 876 1722', email:'mark@gsawexco.com' },
+      { iata:'DUB', city:'Dublin, Ireland',                 lat: 53.4264, lng:  -6.2499, region:'europe',
+        entity:'Wexco Airfreight U.K. Ltd.', type:'GSSA',
+        addr:'Unit 12, 62 Main Street, Applewood, Swords, Co. Dublin',
+        phone:'+353 1 844 4487', email:'paul@wexco.ie' },
+
+      // ── Europe — Switzerland ─────────────────────────────────────────────
+      { iata:'GVA', city:'Geneva, Switzerland',             lat: 46.2381, lng:   6.1089, region:'europe',
+        entity:'Kales Airline Services AG', type:'GSSA',
+        addr:'P.O. Box 1059, 1211 Geneve 5 Fret',
+        phone:'+41 22 717 89 09', email:'info.gva@kales.com' },
+      { iata:'ZRH', city:'Zürich, Switzerland',             lat: 47.4502, lng:   8.5623, region:'europe',
+        entity:'Kales Airline Services AG', type:'GSSA',
+        addr:'Office Building Cargo, P.O. Box 332, 8058 Zürich Airport',
+        phone:'+41 43 816 2908', email:'info.zrh@kales.com' },
+
+      // ── Europe — Nordics ─────────────────────────────────────────────────
+      { iata:'ARN', city:'Stockholm, Sweden',               lat: 59.6519, lng:  17.9186, region:'europe',
+        entity:'Kales Airline Services AB', type:'GSSA',
+        addr:'Söderbyvägen 3C, 195 60 Arlandastad',
+        phone:'+46 85 9441 190', email:'booking.se@kales.com' },
+      { iata:'MMA', city:'Malmö, Sweden',                   lat: 55.5367, lng:  13.3771, region:'europe',
+        entity:'Kales Airline Services AB', type:'GSSA',
+        addr:'Norra Vallgatan 70, 21122 Malmö',
+        phone:'+46 40 36 38 00', email:'booking.se@kales.com' },
+      { iata:'OSL', city:'Oslo, Norway',                    lat: 59.9464, lng:  10.6165, region:'europe',
+        entity:'Kales Airline Services AS', type:'GSSA',
+        addr:'Storgata 45, 2000 Lillestrøm',
+        phone:'+47 2201 2400', email:'info.osl@kales.com' },
+      { iata:'HEL', city:'Helsinki, Finland',               lat: 60.3172, lng:  24.9633, region:'europe',
+        entity:'Kales Airline Services Oy', type:'GSSA',
+        addr:'Äyritie 12 C, 5th floor, 01510 Vantaa',
+        phone:'+358 9870 0350', email:'info.hel@kales.com' },
+      { iata:'CPH', city:'Copenhagen, Denmark',             lat: 55.6180, lng:  12.6560, region:'europe',
+        entity:'Kales Airline Services ApS', type:'GSSA',
+        addr:'Copenhagen Airport, 2770 Kastrup',
+        phone:'+45 3252 8520', email:'info.dk@kales.com' },
+      { iata:'BLL', city:'Billund, Denmark',                lat: 55.7473, lng:   9.1518, region:'europe',
+        entity:'Kales Airline Services ApS', type:'GSSA',
+        addr:'Cargo Centervej 72, 7190 Billund',
+        phone:'+45 7535 4511', email:'info.dk@kales.com' },
+
+      // ── North America ────────────────────────────────────────────────────
+      { iata:'JFK', city:'New York, USA',                   lat: 40.6413, lng: -73.7781, region:'north-america',
+        entity:'Kales Airline Services', type:'GSSA',
+        addr:'263B North Hangar Road, Cargo Area D, Jamaica NY 11430',
+        phone:'+1 917 944-6252', email:'bookings.us@kales.com' },
+      { iata:'IAD', city:'Washington D.C., USA',            lat: 38.8951, lng: -77.0369, region:'north-america',
+        entity:'Kales Airline Services', type:'GSSA',
+        addr:'Washington Dulles International Area, VA',
+        phone:'+1 917 9446252', email:'bookings.us@kales.com' },
+      { iata:'IAH', city:'Houston, USA',                    lat: 29.9844, lng: -95.3677, region:'north-america',
+        entity:'Kales Airline Services', type:'GSSA',
+        addr:'George Bush Intercontinental Airport, Houston TX',
+        phone:null, email:'bookings.us@kales.com' },
+      { iata:'DFW', city:'Dallas, USA',                     lat: 32.8975, lng: -97.0381, region:'north-america',
+        entity:'Kales Airline Services', type:'GSSA',
+        addr:'Dallas / Fort Worth International Airport, TX',
+        phone:null, email:'bookings.us@kales.com' },
+      { iata:'MIA', city:'Miami, USA',                      lat: 25.7959, lng: -80.2870, region:'north-america',
+        entity:'Kales Airline Services', type:'GSSA',
+        addr:'5600 NW 36 St. Suite 513, Bldg 845, Miami FL 33166',
+        phone:'+1 713-962-8636', email:'bookings.us@kales.com' },
+      { iata:'YYZ', city:'Toronto, Canada',                 lat: 43.6777, lng: -79.6248, region:'north-america',
+        entity:'Kales Airline Services Inc.', type:'GSSA',
+        addr:'5955 Airport Road, Suite 106, Mississauga ON L4V-1R9',
+        phone:'+1 905 672 2900', email:'info.yyz@kales.com' },
+      { iata:'YUL', city:'Montreal, Canada',                lat: 45.4655, lng: -73.7581, region:'north-america',
+        entity:'Kales Airline Services Inc.', type:'GSSA',
+        addr:'6500 Trans-Canadian Hwy, Suite 400, Pointe-Claire QC H9R 0A5',
+        phone:null, email:'info.yyz@kales.com' },
+      { iata:'YVR', city:'Vancouver, Canada',               lat: 49.1900, lng:-123.1794, region:'north-america',
+        entity:'Kales Airline Services Inc.', type:'GSSA',
+        addr:'5811 Cooney Road, Suite 305, Richmond BC V6X 3M1',
+        phone:null, email:'info.yvr@kales.com' },
+
+      // ── Latin America ────────────────────────────────────────────────────
+      { iata:'MEX', city:'Mexico City, Mexico',             lat: 19.4361, lng: -99.0722, region:'latam',
+        entity:'Kales Airline Services', type:'GSSA',
+        addr:'Montecito 38, 27th floor, Col. Napoles, 03810 CDMX',
+        phone:null, email:'sales.mx@kales.com' },
+      { iata:'GUA', city:'Guatemala City, Guatemala',       lat: 14.5765, lng: -90.5230, region:'latam',
+        entity:'Aeroexpress Guatemala', type:'GSSA',
+        addr:'Avenida Reforma 1-50, Zona 9, Edificio El Reformador, CDGT',
+        phone:'+502 2334-5567', email:'infogua@aeroexpress.net' },
+      { iata:'SAL', city:'San Salvador, El Salvador',       lat: 13.4409, lng: -89.0558, region:'latam',
+        entity:'Aeroexpress', type:'GSSA',
+        addr:'Edificio Plaza Cristal 2do piso, Colonia Escalón, San Salvador',
+        phone:'+503 2263 2405', email:'infosal@aeroexpress.net' },
+      { iata:'SJO', city:'San José, Costa Rica',            lat:  9.9940, lng: -84.2084, region:'latam',
+        entity:'Aeroexpress Costa Rica', type:'GSSA',
+        addr:'Santamaría Terminals Bldg, 40803 Llorente de Flores, Heredia',
+        phone:'+506 4000 0872', email:'infosjo@aeroexpress.net' },
+      { iata:'PTY', city:'Panama City, Panama',             lat:  9.0695, lng: -79.3835, region:'latam',
+        entity:'Aeroexpress', type:'GSSA',
+        addr:'Cargo Zone, Main Building, Floor 1 Office C114, Tocumen Intl Airport',
+        phone:'+507 238 3566', email:'infopty@aeroexpress.net' },
+      { iata:'BOG', city:'Bogotá, Colombia',                lat:  4.7016, lng: -74.1469, region:'latam',
+        entity:'Kales Airline Services SAS', type:'GSSA',
+        addr:'Calle 106 No. 56-33 Of. 602, Puente Largo, Bogotá',
+        phone:'+571 801 6140', email:'carolina.rodriguez@kales.com' },
+      { iata:'UIO', city:'Quito, Ecuador',                  lat: -0.1807, lng: -78.4678, region:'latam',
+        entity:'Kales Airline Services Ltda.', type:'GSSA',
+        addr:'Av. Catalina Aldaz N23-534 y Portugal, Bristol 2 Of.301, Quito',
+        phone:'+(593-2) 332 6345', email:'maemilia.debyron@kales.com' }
     ];
 
-    // Colour legend dots
+    // ── Build popup HTML ───────────────────────────────────────────────────
+    function buildPopup(o, color) {
+      var rows = '';
+      if (o.addr)  rows += '<div class="pop-row"><span class="pop-ico">📍</span><span>' + o.addr + '</span></div>';
+      if (o.phone) rows += '<div class="pop-row"><span class="pop-ico">📞</span>'
+                         + '<a class="pop-a" href="tel:' + o.phone.replace(/[\s()]/g,'') + '">' + o.phone + '</a></div>';
+      if (o.email) rows += '<div class="pop-row"><span class="pop-ico">✉</span>'
+                         + '<a class="pop-a" href="mailto:' + o.email + '">' + o.email + '</a></div>';
+      return '<div class="map-popup">'
+        + '<div class="pop-head">'
+        + '<span class="pop-iata">' + o.iata + '</span>'
+        + '<span class="pop-badge" style="background:' + color + '22;color:' + color + ';">' + (o.type || 'GSSA') + '</span>'
+        + '</div>'
+        + '<div class="pop-city">' + o.city + '</div>'
+        + '<div class="pop-entity">' + (o.entity || 'Kales Airline Services') + '</div>'
+        + (rows ? '<div class="pop-sep"></div>' + rows : '')
+        + '</div>';
+    }
+
+    // ── Colour legend dots ─────────────────────────────────────────────────
     document.querySelectorAll('.map-legend-dot').forEach(function (dot) {
       var r = dot.getAttribute('data-region');
       if (!COLORS[r]) return;
@@ -518,11 +783,11 @@
       }
     });
 
-    // Initialise map
+    // ── Initialise map ─────────────────────────────────────────────────────
     var map = L.map('offices-map', {
       center: [28, 10],
       zoom: 2,
-      scrollWheelZoom: false,   // don't hijack page scroll
+      scrollWheelZoom: false,
       zoomControl: false,
       attributionControl: true,
       minZoom: 1,
@@ -532,7 +797,6 @@
 
     L.control.zoom({ position: 'topright' }).addTo(map);
 
-    // CartoDB Positron — clean minimal basemap, no API key required
     L.tileLayer(
       'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
       {
@@ -542,12 +806,12 @@
       }
     ).addTo(map);
 
-    // Build and place markers
+    // ── Build and place markers ────────────────────────────────────────────
     offices.forEach(function (o) {
-      var isHQ   = o.region === 'hq';
-      var color  = COLORS[o.region];
-      var size   = isHQ ? 46 : 30;
-      var fsize  = isHQ ?  9 :  7;
+      var isHQ  = o.region === 'hq';
+      var color = COLORS[o.region];
+      var size  = isHQ ? 46 : 30;
+      var fsize = isHQ ?  9 :  7;
 
       var html = '<div class="map-pin' + (isHQ ? ' map-pin-hq' : '') + '" '
         + 'style="width:' + size + 'px;height:' + size + 'px;background:' + color + ';">'
@@ -558,14 +822,16 @@
       var icon = L.divIcon({
         className: '',
         html: html,
-        iconSize:    [size, size],
-        iconAnchor:  [size / 2, size / 2],
-        tooltipAnchor: [0, -(size / 2 + 10)]
+        iconSize:      [size, size],
+        iconAnchor:    [size / 2, size / 2],
+        tooltipAnchor: [0, -(size / 2 + 10)],
+        popupAnchor:   [0, -(size / 2 + 6)]
       });
 
       var marker = L.marker([o.lat, o.lng], { icon: icon, riseOnHover: true, riseOffset: 300 })
         .addTo(map);
 
+      // Hover tooltip — quick IATA / city / region label
       marker.bindTooltip(
         '<div class="map-tt">'
           + '<span class="tt-iata">' + o.iata + '</span>'
@@ -574,15 +840,17 @@
             + REGION_NAMES[o.region]
           + '</span>'
         + '</div>',
-        {
-          className: 'map-custom-tooltip',
-          direction: 'top',
-          permanent: false
-        }
+        { className: 'map-custom-tooltip', direction: 'top', permanent: false }
       );
+
+      // Click popup — full contact card
+      marker.bindPopup(buildPopup(o, color), {
+        maxWidth: 300,
+        className: 'map-contact-popup'
+      });
     });
 
-    // Auto-fit to all markers
+    // ── Auto-fit to all markers ────────────────────────────────────────────
     var bounds = L.latLngBounds(offices.map(function (o) { return [o.lat, o.lng]; }));
     map.fitBounds(bounds, { padding: [48, 48], maxZoom: 3 });
   })();
