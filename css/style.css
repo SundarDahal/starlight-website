@@ -865,7 +865,7 @@ ul { list-style: none; }
 @media (max-width: 480px) {
   .airlines-grid { grid-template-columns: 1fr; }
   .airlines-logo-grid { grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 0.45rem; }
-  .airlines-logo-grid-principals { grid-template-columns: repeat(3, 1fr); }
+  .airlines-logo-grid-principals { grid-template-columns: repeat(2, 1fr); }
   .offices-grid { grid-template-columns: 1fr; }
   .hero-actions { flex-direction: column; align-items: stretch; }
   .hero-actions .btn { justify-content: center; }
