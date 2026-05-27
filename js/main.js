@@ -51,7 +51,7 @@ function handleTrack(e) {
 // In static deployments: falls back to local track-proxy.php
 const CARGOMIS_PROXY = (typeof STARLIGHT_CFG !== 'undefined' && STARLIGHT_CFG.trackProxy)
   ? STARLIGHT_CFG.trackProxy
-  : 'https://staging.starlight.com.np/track-proxy.php';
+  : '/track-proxy.php';
 const CARGOMIS_BASE = 'https://cargomis.net/tracking';
 
 function parseAWB(input) {
