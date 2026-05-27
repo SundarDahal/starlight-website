@@ -194,15 +194,97 @@ function runTrackingFromPage() {
 }
 
 /**
+ * showPopover(type, message)
+ * ──────────────────────────
+ * Shows a temporary popover notification (success or error).
+ * Auto-dismisses after 5 seconds or on click.
+ */
+function showPopover(type, message) {
+  const popover = document.createElement('div');
+  popover.className = `popover popover-${type}`;
+  popover.setAttribute('role', 'alert');
+  popover.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    max-width: 400px;
+    padding: 16px 20px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    z-index: 9999;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    animation: slideIn 0.3s ease-out;
+    cursor: pointer;
+    word-break: break-word;
+  `;
+  
+  if (type === 'success') {
+    popover.style.backgroundColor = '#dcfce7';
+    popover.style.color = '#166534';
+    popover.style.border = '1px solid #bbf7d0';
+    popover.innerHTML = '✔ ' + message;
+  } else if (type === 'error') {
+    popover.style.backgroundColor = '#fee2e2';
+    popover.style.color = '#991b1b';
+    popover.style.border = '1px solid #fecaca';
+    popover.innerHTML = '✖ ' + message;
+  }
+  
+  document.body.appendChild(popover);
+  
+  const dismiss = () => {
+    popover.style.animation = 'slideOut 0.3s ease-in forwards';
+    setTimeout(() => popover.remove(), 300);
+  };
+  
+  popover.addEventListener('click', dismiss);
+  const timeout = setTimeout(dismiss, 5000);
+  
+  popover.addEventListener('mouseenter', () => clearTimeout(timeout));
+}
+
+// Add CSS animations for popovers
+if (!document.getElementById('popover-styles')) {
+  const style = document.createElement('style');
+  style.id = 'popover-styles';
+  style.textContent = `
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    @keyframes slideOut {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+/**
  * initContactForm()
  * ──────────────────────────────────────────────────────────────
  * Handles the contact form submission flow:
  *
  *  1. Intercept the native submit event
  *  2. Run basic client-side validation (required fields, email fmt)
- *  3. Execute reCAPTCHA v3 to get a fresh token
- *  4. POST JSON to contact.php via fetch()
- *  5. Show success or error feedback to the user
+ *  3. Disable the entire form during submission
+ *  4. Execute reCAPTCHA v3 to get a fresh token
+ *  5. POST JSON to contact.php via fetch()
+ *  6. Show success or error feedback as popovers
+ *  7. Clear form on success, re-enable on finally
  *
  * The reCAPTCHA SITE_KEY below must match the key loaded in the
  * <script src="…?render=…"> tag in contact.html.
@@ -212,29 +294,22 @@ function initContactForm() {
   // Falls back to empty string — server will handle the missing token gracefully.
   const RECAPTCHA_SITE_KEY = window.RECAPTCHA_SITE_KEY || '';
 
-  const form       = document.getElementById('contactForm');
+  const form = document.getElementById('contactForm');
   if (!form) return;
 
-  const btn        = document.getElementById('submitBtn');
-  const successBox = document.getElementById('formSuccess');
-  const errorBox   = document.getElementById('formError');
-  const errorText  = document.getElementById('formErrorText');
+  const btn = document.getElementById('submitBtn');
 
-  // ── Helper: show/hide feedback boxes ────────────────────────
-  function showSuccess() {
-    if (successBox) { successBox.style.display = 'block'; }
-    if (errorBox)   { errorBox.style.display   = 'none';  }
+  // ── Helper: disable/enable all form inputs ────────────────────
+  function disableForm() {
+    form.querySelectorAll('input, textarea, select, button').forEach(el => {
+      el.disabled = true;
+    });
   }
 
-  function showError(msg) {
-    if (errorBox)  { errorBox.style.display  = 'block'; }
-    if (errorText) { errorText.textContent   = msg;     }
-    if (successBox){ successBox.style.display = 'none'; }
-  }
-
-  function clearFeedback() {
-    if (successBox) successBox.style.display = 'none';
-    if (errorBox)   errorBox.style.display   = 'none';
+  function enableForm() {
+    form.querySelectorAll('input, textarea, select, button').forEach(el => {
+      el.disabled = false;
+    });
   }
 
   // ── Helper: simple client-side email format check ────────────
@@ -245,7 +320,6 @@ function initContactForm() {
   // ── Submit handler ───────────────────────────────────────────
   form.addEventListener('submit', async function (e) {
     e.preventDefault();
-    clearFeedback();
 
     // -- 1. Client-side validation (fast feedback before network round-trip)
     const name    = form.querySelector('[name="name"]')?.value.trim()    || '';
@@ -253,54 +327,58 @@ function initContactForm() {
     const enquiry = form.querySelector('[name="enquiry"]')?.value.trim() || '';
     const message = form.querySelector('[name="message"]')?.value.trim() || '';
 
-    if (!name)              return showError('Please enter your full name.');
-    if (!isValidEmail(email)) return showError('Please enter a valid email address.');
-    if (!enquiry)           return showError('Please select an enquiry type.');
-    if (!message)           return showError('Please enter a message.');
-
-    // -- 2. Disable button + show loading state
-    btn.textContent = 'Sending…';
-    btn.disabled    = true;
-
-    // -- 3. Get reCAPTCHA v3 token
-    let recaptchaToken = '';
-    try {
-      // grecaptcha is loaded async — wait for it to be ready
-      recaptchaToken = await new Promise((resolve, reject) => {
-        if (typeof grecaptcha === 'undefined') {
-          // reCAPTCHA script may not have loaded (ad-blocker, slow network)
-          // Allow submission to proceed; the server will handle the missing token gracefully
-          resolve('');
-          return;
-        }
-        grecaptcha.ready(() => {
-          grecaptcha
-            .execute(RECAPTCHA_SITE_KEY, { action: 'contact_submit' })
-            .then(resolve)
-            .catch(reject);
-        });
-      });
-    } catch (err) {
-      console.warn('reCAPTCHA execute failed:', err);
-      // Don't block submission — server will reject if token is truly required
+    if (!name) {
+      return showPopover('error', 'Please enter your full name.');
+    }
+    if (!isValidEmail(email)) {
+      return showPopover('error', 'Please enter a valid email address.');
+    }
+    if (!enquiry) {
+      return showPopover('error', 'Please select an enquiry type.');
+    }
+    if (!message) {
+      return showPopover('error', 'Please enter a message.');
     }
 
-    // Populate the hidden field (PHP reads this)
-    const tokenField = document.getElementById('recaptchaToken');
-    if (tokenField) tokenField.value = recaptchaToken;
-
-    // -- 4. Build payload and POST to contact.php
-    const payload = {
-      name:            name,
-      company:         form.querySelector('[name="company"]')?.value.trim() || '',
-      email:           email,
-      phone:           form.querySelector('[name="phone"]')?.value.trim()   || '',
-      enquiry:         enquiry,
-      message:         message,
-      recaptcha_token: recaptchaToken,
-    };
+    // -- 2. Disable form and show loading state
+    disableForm();
+    btn.textContent = 'Sending…';
 
     try {
+      // -- 3. Get reCAPTCHA v3 token
+      let recaptchaToken = '';
+      try {
+        // grecaptcha is loaded async — wait for it to be ready
+        recaptchaToken = await new Promise((resolve, reject) => {
+          if (typeof grecaptcha === 'undefined') {
+            // reCAPTCHA script may not have loaded (ad-blocker, slow network)
+            // Allow submission to proceed; the server will handle the missing token gracefully
+            resolve('');
+            return;
+          }
+          grecaptcha.ready(() => {
+            grecaptcha
+              .execute(RECAPTCHA_SITE_KEY, { action: 'contact_submit' })
+              .then(resolve)
+              .catch(reject);
+          });
+        });
+      } catch (err) {
+        console.warn('reCAPTCHA execute failed:', err);
+        // Don't block submission — server will reject if token is truly required
+      }
+
+      // -- 4. Build payload and POST to contact.php
+      const payload = {
+        name:            name,
+        company:         form.querySelector('[name="company"]')?.value.trim() || '',
+        email:           email,
+        phone:           form.querySelector('[name="phone"]')?.value.trim()   || '',
+        enquiry:         enquiry,
+        message:         message,
+        recaptcha_token: recaptchaToken,
+      };
+
       const response = await fetch('contact.php', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -316,25 +394,22 @@ function initContactForm() {
       }
 
       if (data.success) {
-        // -- 5a. Success
-        showSuccess();
+        // -- 5a. Success: show popover, clear form
+        showPopover('success', data.message || 'Your message has been sent. Our team will respond within one business day.');
         form.reset();
       } else {
         // -- 5b. Server-side validation / reCAPTCHA failure
-        showError(data.message || 'Submission failed. Please try again.');
+        showPopover('error', data.message || 'Submission failed. Please try again.');
       }
 
     } catch (err) {
       // Network error or JSON parse failure
       console.error('Contact form error:', err);
-      showError(
-        'Could not reach the server. Please check your connection or email us directly at ' +
-        'ktmops@starlight.com.np'
-      );
+      showPopover('error', 'Could not reach the server. Please check your connection or email us directly at ktmops@starlight.com.np');
     } finally {
-      // Always re-enable the button
+      // Always re-enable the form and restore button
+      enableForm();
       btn.textContent = 'Send Message';
-      btn.disabled    = false;
     }
   });
 }
