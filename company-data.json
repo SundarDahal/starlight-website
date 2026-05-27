@@ -23,7 +23,12 @@
       "website": null,
       "service_type": "Air Cargo GSSA",
       "services": ["Air Cargo GSSA", "General cargo", "Perishables", "Pharmaceuticals", "E-commerce"],
-      "airlines_represented": [],
+      "airlines_represented": [
+        {"name": "Druk Air", "iata_code": "KB", "prefix": "129"},
+        {"name": "Japan Airlines", "iata_code": "JL", "prefix": "131"},
+        {"name": "Maldivian", "iata_code": "Q2", "prefix": "647"},
+        {"name": "Pegasus Airlines", "iata_code": "PC", "prefix": "624"}
+      ],
       "personnel": [
         {
           "name": "Sundar Dahal",

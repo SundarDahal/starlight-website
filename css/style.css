@@ -224,6 +224,40 @@ ul { list-style: none; }
 .airline-card-cta { border: 2px dashed var(--border); background: var(--gray-50); }
 .airline-card-cta .airline-logo-placeholder { font-size: 3rem; opacity: 0.4; }
 .airlines-note { font-size: 0.8rem; color: var(--gray); font-style: italic; text-align: center; }
+.airlines-sub-label {
+  font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--gray); margin: 0 0 0.65rem;
+}
+.airlines-sub-label.mt { margin-top: 2rem; }
+.airlines-logo-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+  gap: 0.6rem; margin-bottom: 0.5rem;
+}
+.airlines-logo-grid-principals {
+  grid-template-columns: repeat(4, 1fr); max-width: 600px; margin-bottom: 0.5rem;
+}
+.airline-logo-card {
+  background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 0.8rem 0.5rem 0.65rem;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 0.45rem; min-height: 66px; text-align: center;
+  transition: all var(--transition); cursor: default;
+}
+.airline-logo-card:hover { border-color: var(--red); transform: translateY(-2px); box-shadow: var(--shadow); }
+.airline-logo-card img { height: 24px; max-width: 96px; object-fit: contain; }
+.airline-logo-card span { font-size: 0.67rem; font-weight: 600; color: var(--charcoal); line-height: 1.3; }
+.airline-logo-card-principal {
+  border-color: rgba(200,16,46,0.4); background: rgba(200,16,46,0.04);
+  min-height: 86px; padding: 1rem 0.7rem 0.85rem;
+}
+.airline-logo-card-principal img { height: 30px; max-width: 108px; }
+.airline-logo-card-principal span { color: var(--red); font-size: 0.76rem; }
+.airline-logo-card-principal:hover { border-color: var(--red); }
+.airlines-cta-row {
+  display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;
+  margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border);
+}
+.airlines-cta-row p { flex: 1; font-size: 0.88rem; color: var(--gray); min-width: 200px; }
 
 /* ===== TRACK BANNER ===== */
 .track-banner {
@@ -799,6 +833,8 @@ ul { list-style: none; }
   .section-title { font-size: 1.75rem; }
   .services-grid { grid-template-columns: 1fr; }
   .airlines-grid { grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+  .airlines-logo-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+  .airlines-logo-grid-principals { max-width: 100%; }
   .gssa-visual { grid-template-columns: 1fr; }
   .gssa-grid { gap: 2rem; }
   .why-points { gap: 1.25rem; }
@@ -826,6 +862,8 @@ ul { list-style: none; }
 }
 @media (max-width: 480px) {
   .airlines-grid { grid-template-columns: 1fr; }
+  .airlines-logo-grid { grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); gap: 0.45rem; }
+  .airlines-logo-grid-principals { grid-template-columns: repeat(3, 1fr); }
   .offices-grid { grid-template-columns: 1fr; }
   .hero-actions { flex-direction: column; align-items: stretch; }
   .hero-actions .btn { justify-content: center; }
