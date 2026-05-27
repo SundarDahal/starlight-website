@@ -292,7 +292,7 @@ if (!document.getElementById('popover-styles')) {
 function initContactForm() {
   // Key is injected by api/config.js.php (reads RECAPTCHA_SITE_KEY env var).
   // Falls back to empty string — server will handle the missing token gracefully.
-  const RECAPTCHA_SITE_KEY = window.RECAPTCHA_SITE_KEY || '';
+  const RECAPTCHA_SITE_KEY = window.RECAPTCHA_SITE_KEY || '6Lci5v4sAAAAADv7Xwes35yNhMlixckr1Ho5FAm4';
 
   const form = document.getElementById('contactForm');
   if (!form) return;
