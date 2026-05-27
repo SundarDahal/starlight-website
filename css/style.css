@@ -236,7 +236,7 @@ ul { list-style: none; }
   gap: 0.6rem; margin-bottom: 0.5rem;
 }
 .airlines-logo-grid-principals {
-  display: grid; grid-template-columns: repeat(4, 1fr); max-width: 600px; margin-bottom: 0.5rem;
+  display: grid; grid-template-columns: repeat(4, 1fr); max-width: 600px; margin: 0 auto 0.5rem;
 }
 .airline-logo-card {
   background: var(--white); border: 1px solid var(--border); border-radius: var(--radius);
