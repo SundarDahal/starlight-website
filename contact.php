@@ -28,9 +28,9 @@ define('RECAPTCHA_SECRET',    getenv('RECAPTCHA_SECRET_KEY') ?: '6Lci5v4sAAAAAPX
 define('RECAPTCHA_MIN_SCORE', 0.5);   // 0.0 (bot) → 1.0 (human); 0.5 is Google's recommended default
 define('RECAPTCHA_ACTION',    'contact_submit');  // must match grecaptcha.execute() action in JS
 
-define('MAIL_TO',        'ktmops@starlight.com.np');
-define('MAIL_FROM_ADDR', 'md@starlightexp.com');
-define('MAIL_FROM_NAME', 'Starlight Express Website');
+define('MAIL_TO',        'customerservice@starlight.com.np');
+define('MAIL_FROM_ADDR', 'noreply@starlight.com.np');
+define('MAIL_FROM_NAME', 'Starlight Express Website Inquiry');
 
 define('RATE_LIMIT_MAX',    5);    // max submissions per window per IP
 define('RATE_LIMIT_WINDOW', 600);  // window in seconds (10 minutes)
@@ -101,23 +101,93 @@ $enquiry_labels = [
 ];
 $enquiry_label = $enquiry_labels[$enquiry] ?? $enquiry;
 
-$subject = '[Starlight Express] New Enquiry: ' . $enquiry_label;
+$subject = $enquiry_label . ' — Contact Form';
 
-$divider = str_repeat('─', 60);
+// Build modern HTML email template
+$body = <<<'HTML'
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; background: #f9fafb; padding: 20px; }
+        .header { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+        .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
+        .header p { margin: 8px 0 0 0; font-size: 14px; opacity: 0.9; }
+        .content { background: white; padding: 40px; border-radius: 0 0 8px 8px; }
+        .inquiry-type { background: #f0f9ff; border-left: 4px solid #3b82f6; padding: 16px; margin-bottom: 24px; border-radius: 4px; }
+        .inquiry-type strong { color: #1e3a8a; }
+        .field { margin-bottom: 20px; }
+        .field-label { font-weight: 600; color: #1f2937; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+        .field-value { color: #4b5563; font-size: 15px; }
+        .message-box { background: #f3f4f6; padding: 16px; border-radius: 6px; border-left: 3px solid #059669; margin-top: 8px; }
+        .divider { height: 1px; background: #e5e7eb; margin: 24px 0; }
+        .meta { background: #f9fafb; padding: 16px; border-radius: 6px; font-size: 12px; color: #6b7280; }
+        .meta-item { margin-bottom: 8px; }
+        .meta-item strong { color: #374151; }
+        .footer { text-align: center; padding: 20px; font-size: 12px; color: #9ca3af; border-top: 1px solid #e5e7eb; margin-top: 24px; }
+        .cta-button { display: inline-block; background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 600; margin-top: 16px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>New Contact Form Submission</h1>
+            <p>Starlight Express — Nepal's Leading Air Cargo GSSA</p>
+        </div>
+        <div class="content">
+            <div class="inquiry-type">
+                <strong>Inquiry Type:</strong> INQUIRY_TYPE
+            </div>
+            
+            <div class="field">
+                <div class="field-label">Sender Information</div>
+                <div class="field-value">
+                    <strong>SENDER_NAME</strong><br>
+                    Email: <a href="mailto:SENDER_EMAIL">SENDER_EMAIL</a><br>
+                    Phone: SENDER_PHONE<br>
+                    Company: SENDER_COMPANY
+                </div>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="field">
+                <div class="field-label">Message</div>
+                <div class="message-box">MESSAGE_BODY</div>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="meta">
+                <div class="meta-item"><strong>Submitted:</strong> SUBMITTED_TIME</div>
+                <div class="meta-item"><strong>IP Address:</strong> IP_ADDRESS</div>
+                <div class="meta-item"><strong>User Agent:</strong> USER_AGENT</div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 24px;">
+                <a href="mailto:SENDER_EMAIL" class="cta-button">Reply to Sender</a>
+            </div>
+        </div>
+        <div class="footer">
+            <p>This is an automated notification from starlight.com.np contact form. Please do not reply to this email.</p>
+        </div>
+    </div>
+</body>
+</html>
+HTML;
 
-$body  = "New contact form submission — Starlight Express website\n";
-$body .= "{$divider}\n";
-$body .= sprintf("%-12s %s\n", 'Name:',    $name);
-$body .= sprintf("%-12s %s\n", 'Company:', $company !== '' ? $company : '(not provided)');
-$body .= sprintf("%-12s %s\n", 'Email:',   $email);
-$body .= sprintf("%-12s %s\n", 'Phone:',   $phone   !== '' ? $phone   : '(not provided)');
-$body .= sprintf("%-12s %s\n", 'Enquiry:', $enquiry_label);
-$body .= "{$divider}\n";
-$body .= "Message:\n\n{$message}\n";
-$body .= "{$divider}\n";
-$body .= sprintf("%-12s %s\n", 'Submitted:', date('Y-m-d H:i:s T'));
-$body .= sprintf("%-12s %s\n", 'IP:',        $_SERVER['REMOTE_ADDR'] ?? 'unknown');
-$body .= sprintf("%-12s %s\n", 'User-Agent:', mb_substr($_SERVER['HTTP_USER_AGENT'] ?? 'unknown', 0, 120));
+// Replace template placeholders
+$body = str_replace('INQUIRY_TYPE', $enquiry_label, $body);
+$body = str_replace('SENDER_NAME', htmlspecialchars($name, ENT_QUOTES, 'UTF-8'), $body);
+$body = str_replace('SENDER_EMAIL', htmlspecialchars($email, ENT_QUOTES, 'UTF-8'), $body);
+$body = str_replace('SENDER_PHONE', htmlspecialchars($phone !== '' ? $phone : '(not provided)', ENT_QUOTES, 'UTF-8'), $body);
+$body = str_replace('SENDER_COMPANY', htmlspecialchars($company !== '' ? $company : '(not provided)', ENT_QUOTES, 'UTF-8'), $body);
+$body = str_replace('MESSAGE_BODY', nl2br(htmlspecialchars($message, ENT_QUOTES, 'UTF-8')), $body);
+$body = str_replace('SUBMITTED_TIME', date('Y-m-d H:i:s T'), $body);
+$body = str_replace('IP_ADDRESS', htmlspecialchars($_SERVER['REMOTE_ADDR'] ?? 'unknown', ENT_QUOTES, 'UTF-8'), $body);
+$body = str_replace('USER_AGENT', htmlspecialchars(mb_substr($_SERVER['HTTP_USER_AGENT'] ?? 'unknown', 0, 120), ENT_QUOTES, 'UTF-8'), $body);
 
 
 // ── Mail headers ──────────────────────────────────────────────
@@ -125,7 +195,7 @@ $body .= sprintf("%-12s %s\n", 'User-Agent:', mb_substr($_SERVER['HTTP_USER_AGEN
 $headers  = "From: " . MAIL_FROM_NAME . " <" . MAIL_FROM_ADDR . ">\r\n";
 $headers .= "Reply-To: {$name} <{$email}>\r\n";
 $headers .= "MIME-Version: 1.0\r\n";
-$headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
+$headers .= "Content-Type: text/html; charset=UTF-8\r\n";
 $headers .= "Content-Transfer-Encoding: 8bit\r\n";
 $headers .= "X-Mailer: PHP/" . phpversion() . "\r\n";
 $headers .= "X-Priority: 3\r\n";  // normal priority
