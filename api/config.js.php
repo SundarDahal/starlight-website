@@ -20,7 +20,8 @@ header('Content-Type: application/javascript; charset=UTF-8');
 header('Cache-Control: no-store, no-cache, must-revalidate');
 header('X-Content-Type-Options: nosniff');
 
-$key = getenv('RECAPTCHA_SITE_KEY') ?: '';
+// Try environment first, then fallback (public key safe to hardcode)
+$key = getenv('RECAPTCHA_SITE_KEY') ?: '6Lci5v4sAAAAADv7Xwes35yNhMlixckr1Ho5FAm4';
 
 // json_encode() safely escapes the key for JS string context.
 echo 'window.RECAPTCHA_SITE_KEY = ' . json_encode($key) . ';' . PHP_EOL;
