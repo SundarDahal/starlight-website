@@ -40,7 +40,9 @@ RUN rm -rf  /var/www/html/docker \
             /var/www/html/.dockerignore \
             /var/www/html/.env* \
             /var/www/html/.git \
-            /var/www/html/.gitignore
+            /var/www/html/.gitignore && \
+    # Scrub any Windows Zone.Identifier stubs that slipped past .dockerignore
+    find /var/www/html -name '*:Zone.Identifier' -delete
 
 # Tighten permissions
 RUN chown -R www-data:www-data /var/www/html && \

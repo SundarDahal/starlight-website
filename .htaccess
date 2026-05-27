@@ -1,6 +1,16 @@
 Options -Indexes
 ServerSignature Off
 
+# Block Windows Zone.Identifier alternate-data-stream stubs (WSL artefacts)
+<FilesMatch "\.Zone\.Identifier$">
+    Require all denied
+</FilesMatch>
+
+# Protect server/config files from direct access
+<FilesMatch "^(\.htaccess|\.env.*|composer\.(json|lock)|package(-lock)?\.json)$">
+    Require all denied
+</FilesMatch>
+
 RewriteEngine On
 
 # Force HTTPS (skip on localhost so Docker dev works over plain HTTP)

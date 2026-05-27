@@ -22,6 +22,9 @@ Thumbs.db
 .idea/
 .vscode/
 
+# Windows Zone.Identifier alternate-data-stream stubs (WSL artefacts)
+*:Zone.Identifier
+
 # Docker meta (no need to copy these into the web root)
 .dockerignore
 docker-compose.yml
