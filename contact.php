@@ -24,7 +24,7 @@
  */
 
 // ── Configuration ────────────────────────────────────────────
-define('RECAPTCHA_SECRET',    'REPLACE_WITH_YOUR_RECAPTCHA_SECRET_KEY');
+define('RECAPTCHA_SECRET',    getenv('RECAPTCHA_SECRET_KEY') ?: 'REPLACE_WITH_YOUR_RECAPTCHA_SECRET_KEY');
 define('RECAPTCHA_MIN_SCORE', 0.5);   // 0.0 (bot) → 1.0 (human); 0.5 is Google's recommended default
 define('RECAPTCHA_ACTION',    'contact_submit');  // must match grecaptcha.execute() action in JS
 

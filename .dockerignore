@@ -1,0 +1,32 @@
+# =============================================================
+#  .dockerignore — files excluded from the Docker build context
+# =============================================================
+#
+#  These files are NOT sent to the Docker daemon, so they
+#  cannot accidentally end up in the container image.
+# =============================================================
+
+# Secret / environment files — never bake into the image
+.env
+*.env
+
+# Git metadata
+.git
+.gitignore
+
+# Editor / OS noise
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Docker meta (no need to copy these into the web root)
+.dockerignore
+docker-compose.yml
+docker-compose.*.yml
+
+# Node / package files (not used but guard against accidents)
+node_modules/
+npm-debug.log

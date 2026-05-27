@@ -208,7 +208,9 @@ function runTrackingFromPage() {
  * <script src="…?render=…"> tag in contact.html.
  */
 function initContactForm() {
-  const RECAPTCHA_SITE_KEY = 'REPLACE_WITH_YOUR_RECAPTCHA_SITE_KEY';
+  // Key is injected by api/config.js.php (reads RECAPTCHA_SITE_KEY env var).
+  // Falls back to empty string — server will handle the missing token gracefully.
+  const RECAPTCHA_SITE_KEY = window.RECAPTCHA_SITE_KEY || '';
 
   const form       = document.getElementById('contactForm');
   if (!form) return;

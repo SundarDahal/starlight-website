@@ -5,6 +5,11 @@
 .DS_Store
 Thumbs.db
 
+# ── Environment / secrets ────────────────────────────────────────────────────
+# .env holds real API keys — never commit it
+.env
+*.env
+
 # ── Docker runtime ────────────────────────────────────────────────────────────
 # (docker-compose.yml and Dockerfile are intentionally committed)
 

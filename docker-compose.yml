@@ -1,15 +1,32 @@
 services:
+
+  # ── PHP/Apache web server ─────────────────────────────────────
   web:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: starlight_web
     ports:
-      - "9000:80"          # http://localhost:9000
+      - "9000:80"          # Site → http://localhost:9000
     volumes:
-      # Live-reload: mount site files so changes are reflected without rebuild
+      # Live-reload: edits to .php/.html/.css/.js are visible instantly
+      # (the volume mount overlays the COPY in the image at runtime)
       - .:/var/www/html
     restart: unless-stopped
+    env_file:
+      - .env               # Create from .env.example before first run
     environment:
-      # Silence the Apache "ServerName" warning
       APACHE_SERVER_NAME: localhost
+    depends_on:
+      - mailhog
+
+  # ── Mailhog (dev email catcher) ───────────────────────────────
+  # All mail sent by PHP lands here instead of going to real inboxes.
+  # Web UI: http://localhost:8025
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: starlight_mailhog
+    ports:
+      - "8025:8025"        # Mailhog web UI → http://localhost:8025
+      - "1025:1025"        # SMTP (PHP mail() routes here via msmtp)
+    restart: unless-stopped

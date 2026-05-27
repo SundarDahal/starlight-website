@@ -1,113 +1,146 @@
 # Starlight Express Website
 
-**Nepal's #1 Air Cargo GSSA** — official corporate website for [Starlight Express Pvt. Ltd.](https://www.starlight.com.np)
-
-A modern, fast, SEO-optimised static website built for Starlight Express in its new positioning as a dedicated General Sales & Service Agent (GSSA) for international airlines in Nepal, in partnership with [Kales Airline Services](https://kales.com/).
+**Nepal's #1 Air Cargo GSSA** — official corporate website for [Starlight Express Pvt. Ltd.](https://www.starlight.com.np), a proud partner of [Kales Airline Services](https://kales.com/).
 
 ---
 
-## 🌟 Key Features
+## ✨ Key Features
 
-- **6 fully designed pages** — Home, About, Airlines We Represent, Services, Track Shipment, Contact
-- **CargoMIS tracking integration** — embedded AWB tracking from cargomis.net
-- **SEO + AI-friendly content** — JSON-LD structured data (Organization, FAQPage, LocalBusiness), strong keyword density, natural Q&A patterns
-- **AI assistant ready** — `robots.txt` allows GPTBot, ClaudeBot, PerplexityBot and others; FAQ schema designed for AI extraction
+- **7 fully designed pages** — Home, About, Offices & Network, Services, Track Shipment, Contact, Privacy
+- **Live airline portfolio** — 4 Nepal principals + 40+ Kales network airlines with logos from `pics.avs.io`
+- **Interactive global map** — 69 Kales office pins with click popups across 36 countries
+- **Contact form** — PHP backend with reCAPTCHA v3, XSS sanitization, IP rate-limiting
+- **CargoMIS AWB tracking** — embedded shipment lookup
+- **SEO + JSON-LD** — Organization, LocalBusiness, FAQPage schemas; AI-crawler friendly
+- **Zero JS dependencies** — Pure HTML / CSS / vanilla JS, no build step
 - **Fully responsive** — Mobile, tablet, desktop
-- **Zero dependencies** — Pure HTML/CSS/JS, no frameworks, no build step
-- **Production-grade design** — Custom navy + gold brand palette, distinctive typography (Bebas Neue + Outfit)
-- **Fast** — Loads in under 2 seconds on a 3G connection
-- **Accessible** — Semantic HTML, ARIA labels, keyboard navigation
 
 ---
 
-## 📁 Structure
+## 📁 Project Structure
 
 ```
 starlight/
-├── index.html              Home — Hero, GSSA explainer, airlines, services, FAQ
-├── about.html              About — Company story, Kales partnership, timeline
-├── airlines.html           Airlines portfolio (Turkish Cargo, Etihad, Cargolux, etc.)
+├── index.html              Home — hero, airlines, services, FAQ
+├── about.html              Company story & Kales partnership
+├── offices.html            Interactive global office map (69 pins)
 ├── services.html           Full GSSA service catalogue
 ├── track.html              CargoMIS AWB tracking
 ├── contact.html            Contact form + Google Maps
+├── privacy.html            Privacy & cookie policy
+│
+├── contact.php             Form handler (reCAPTCHA v3, mail, rate-limit)
+├── track-proxy.php         CargoMIS proxy (cURL)
+│
+├── api/
+│   └── config.js.php       Serves RECAPTCHA_SITE_KEY to the browser
+│
+├── css/style.css           All styles (single file)
+├── js/main.js              Navigation, tracking, contact form, cookie consent
+├── images/                 Brand assets, airline logos, map tiles
+├── company-data.json       Kales network data (69 offices, 36 countries)
+│
 ├── sitemap.xml             SEO sitemap
 ├── robots.txt              Crawler instructions (incl. AI bots)
-├── favicon.svg             Site icon
-├── css/style.css           All styles (single file)
-├── js/main.js              Navigation, tracking, forms
-├── images/                 Brand assets
-├── DEPLOY.md               📖 Full deployment guide
+│
+├── Dockerfile              PHP 8.2 + Apache + msmtp
+├── docker-compose.yml      Web + Mailhog services
+├── docker/
+│   └── entrypoint.sh       Generates msmtprc from env vars at startup
+│
+├── .env.example            ← copy to .env and fill in keys
+├── .dockerignore
 └── README.md               This file
 ```
 
 ---
 
-## 🚀 Quick Deploy
+## 🚀 Quick Start (Docker — recommended)
 
-The simplest path to production:
+### 1. Prerequisites
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (or Docker Engine + Compose plugin)
 
-1. **Drag and drop** the entire `starlight/` folder onto [Netlify](https://app.netlify.com/drop)
-2. Add your custom domain `www.starlight.com.np` in site settings
-3. Update DNS at your registrar
-4. Done — site is live with free SSL
+### 2. Configure environment
 
-For traditional cPanel hosting and other options, see **[DEPLOY.md](./DEPLOY.md)**.
+```bash
+cp .env.example .env
+```
+
+Open `.env` and fill in:
+
+| Variable | Where to get it |
+|---|---|
+| `RECAPTCHA_SITE_KEY` | [Google reCAPTCHA Admin](https://www.google.com/recaptcha/admin) — choose **v3**, add `localhost` + your production domain |
+| `RECAPTCHA_SECRET_KEY` | Same page — the secret key |
+| `SMTP_*` | Leave as-is for dev (Mailhog); change for production |
+
+### 3. Start
+
+```bash
+docker-compose up --build
+```
+
+| Service | URL |
+|---|---|
+| Website | http://localhost:9000 |
+| Mailhog (caught emails) | http://localhost:8025 |
+
+> **Live reload:** The project directory is volume-mounted into the container. HTML/CSS/JS/PHP changes appear immediately — no rebuild required.
+
+### 4. Stop
+
+```bash
+docker-compose down
+```
 
 ---
 
-## 🔧 What Needs Configuration Before Going Live
+## 📧 Email in Development
 
-1. **CargoMIS URL** in `js/main.js` — confirm the exact tracking URL for your CargoMIS account
-2. **Contact form backend** in `contact.html` — wire up Formspree, Web3Forms, or a PHP mail handler
-3. **Real airline list** in `airlines.html` and `index.html` — replace example airlines with your actual GSSA portfolio
-4. **Real images** in `images/` — replace logo SVG with brand assets; add airline logos and hero imagery
-5. **Google Maps coordinates** in `contact.html` — verify the embedded map points to the correct office
+All email sent by the contact form is **caught by Mailhog** — nothing reaches real inboxes. Open [http://localhost:8025](http://localhost:8025) to see captured messages.
 
-Full instructions for each in [DEPLOY.md](./DEPLOY.md).
+To test the full flow:
+1. Fill in the contact form at http://localhost:9000/contact.html
+2. Submit → check Mailhog UI for the formatted email
+
+---
+
+## 🔑 Before Going Live (Production Checklist)
+
+- [ ] Register your domain in [Google reCAPTCHA Admin](https://www.google.com/recaptcha/admin) and update `.env` keys
+- [ ] Set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` in `.env` to your real SMTP relay
+- [ ] Verify `MAIL_TO` in `contact.php` (`ktmops@starlight.com.np`) is the correct inbox
+- [ ] Confirm the Google Maps embed in `contact.html` points to the right office location
+- [ ] Update `sitemap.xml` with the live domain and current dates
+- [ ] Enable HTTPS on your server — the `.htaccess` HTTPS redirect is already in place (it skips localhost)
 
 ---
 
 ## 🎨 Design System
 
 ```css
-/* Brand colors */
---navy:       #0a1628    /* primary dark, headings, navbar */
---gold:       #d4a017    /* accent, CTAs, highlights */
---gold-pale:  #fef3c7    /* badge backgrounds */
---off-white:  #f8f9fc    /* section backgrounds */
+/* Brand colours */
+--navy:    #0a1628    /* headings, navbar */
+--red:     #c8102e    /* CTA, principal airline cards */
+--gold:    #d4a017    /* accents, highlights */
+--white:   #ffffff
+--off-white: #f8f9fc  /* section backgrounds */
 
 /* Typography */
---font-display: 'Bebas Neue'   /* headings, logo */
+--font-display: 'Bebas Neue'   /* headings */
 --font-body:    'Outfit'       /* body text, UI */
 ```
 
-Inspired by the clean, airline-industry aesthetic of [kales.com](https://kales.com) but reinterpreted with a more distinctive navy + gold identity that signals premium air cargo service.
-
 ---
 
-## 🔍 SEO Strategy
+## 🌐 Airline Data
 
-The site is built to rank for these primary keywords:
+`company-data.json` contains the full scraped Kales network:
+- **69 offices** across **36 countries**
+- **49 unique airlines** (after deduplication)
+- Nepal principals: Druk Air (KB), Japan Airlines (JL), Maldivian (Q2), Pegasus Airlines (PC)
 
-- "GSSA Nepal" / "air cargo GSSA Nepal"
-- "air cargo Kathmandu" / "air freight Nepal"
-- "General Sales Agent Nepal"
-- "Starlight Express"
-- "airline cargo agent Nepal"
-- "cargo tracking Nepal"
-
-And to be cited by AI assistants (ChatGPT, Claude, Perplexity) when users ask:
-
-- *"Who is the best air cargo GSSA in Nepal?"*
-- *"How do I ship air cargo from Kathmandu?"*
-- *"What is a GSSA?"*
-- *"Which airlines does Starlight Express represent?"*
-
-This is achieved through:
-- FAQ JSON-LD schema on the homepage
-- Natural-language Q&A patterns (the way LLMs prefer to extract facts)
-- Strong topical authority via consistent keyword usage across pages
-- Explicit `robots.txt` permission for AI crawlers
+Airline logos are loaded from `https://pics.avs.io/200/50/{IATA}.png`. Cards degrade gracefully (name only) when a logo isn't available.
 
 ---
 
@@ -115,13 +148,4 @@ This is achieved through:
 
 © 2025 Starlight Express Pvt. Ltd. All rights reserved.
 
-This website's code is the property of Starlight Express. Third-party fonts (Google Fonts) and embedded services (Google Maps, CargoMIS) are subject to their own terms.
-
----
-
-## 🤝 Credits
-
-- **Built for:** Starlight Express Pvt. Ltd., Kathmandu, Nepal
-- **Strategic partner referenced:** [Kales Airline Services](https://kales.com/)
-- **Tracking provider:** [CargoMIS](https://www.cargomis.net)
-- **Fonts:** Bebas Neue + Outfit (Google Fonts)
+Third-party services used: Google Fonts, Google Maps, Google reCAPTCHA, CargoMIS, Kales Airline Services, pics.avs.io.

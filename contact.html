@@ -16,14 +16,24 @@
   <link rel="stylesheet" href="css/style.css" />
 
   <!--
-    reCAPTCHA v3
-    ─────────────────────────────────────────────────────────
-    Replace REPLACE_WITH_YOUR_RECAPTCHA_SITE_KEY below with
-    the Site Key from https://www.google.com/recaptcha/admin
-    (choose reCAPTCHA v3, add your domain).
-    The matching Secret Key goes in contact.php.
+    reCAPTCHA v3 — loaded dynamically from the server-side config endpoint.
+    The Site Key is served by api/config.js.php which reads the
+    RECAPTCHA_SITE_KEY environment variable — no key is hardcoded in HTML.
+    Set RECAPTCHA_SITE_KEY + RECAPTCHA_SECRET_KEY in your .env file.
   -->
-  <script src="https://www.google.com/recaptcha/api.js?render=REPLACE_WITH_YOUR_RECAPTCHA_SITE_KEY" async defer></script>
+  <script src="api/config.js.php"></script>
+  <script>
+    (function () {
+      var key = window.RECAPTCHA_SITE_KEY;
+      if (key) {
+        var s = document.createElement('script');
+        s.src   = 'https://www.google.com/recaptcha/api.js?render=' + encodeURIComponent(key);
+        s.async = true;
+        s.defer = true;
+        document.head.appendChild(s);
+      }
+    })();
+  </script>
 
   <!-- JSON-LD: LocalBusiness -->
   <script type="application/ld+json">
