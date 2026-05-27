@@ -78,7 +78,6 @@ $email   = sanitize_email_field($data['email'] ?? '');
 $phone   = sanitize_phone($data['phone']   ?? '');
 $enquiry = sanitize_enum($data['enquiry']  ?? '', [
     'airline-partnership',
-    'freight-quote',
     'shipment-tracking',
     'special-cargo',
     'general',
@@ -96,7 +95,6 @@ if ($message === '') json_out(false, 'Message cannot be empty.');
 // ── Build email ───────────────────────────────────────────────
 $enquiry_labels = [
     'airline-partnership' => 'Airline — GSSA Partnership',
-    'freight-quote'       => 'Freight Forwarder — Cargo Quote',
     'shipment-tracking'   => 'Shipment Tracking Help',
     'special-cargo'       => 'Special Cargo Enquiry',
     'general'             => 'General Enquiry',
