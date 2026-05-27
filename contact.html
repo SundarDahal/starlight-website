@@ -15,6 +15,16 @@
   <link rel="apple-touch-icon" sizes="256x256" href="images/apple-touch-icon.png" />
   <link rel="stylesheet" href="css/style.css" />
 
+  <!--
+    reCAPTCHA v3
+    ─────────────────────────────────────────────────────────
+    Replace REPLACE_WITH_YOUR_RECAPTCHA_SITE_KEY below with
+    the Site Key from https://www.google.com/recaptcha/admin
+    (choose reCAPTCHA v3, add your domain).
+    The matching Secret Key goes in contact.php.
+  -->
+  <script src="https://www.google.com/recaptcha/api.js?render=REPLACE_WITH_YOUR_RECAPTCHA_SITE_KEY" async defer></script>
+
   <!-- JSON-LD: LocalBusiness -->
   <script type="application/ld+json">
   {
@@ -132,7 +142,7 @@
           <h2 style="font-family:var(--font-display); font-size:2rem; color:var(--navy); letter-spacing:0.02em; margin-bottom:0.5rem;">Send Us a Message</h2>
           <p style="color:var(--gray-500); margin-bottom:2rem; font-size:0.95rem;">Tell us about your cargo needs and we'll respond within one business day.</p>
 
-          <form id="contactForm" autocomplete="on">
+          <form id="contactForm" action="contact.php" method="POST" autocomplete="on" novalidate>
             <div class="form-row">
               <div class="form-group">
                 <label for="name">Full Name *</label>
@@ -172,10 +182,16 @@
               <textarea id="message" name="message" required placeholder="Tell us about your enquiry, shipment details, or partnership interest..."></textarea>
             </div>
 
-            <button type="submit" class="btn btn-primary btn-lg" style="width:100%;">Send Message</button>
+            <!-- reCAPTCHA v3 token — populated by JS before submit -->
+            <input type="hidden" id="recaptchaToken" name="recaptcha_token" />
 
-            <div id="formSuccess" style="display:none; margin-top:1.25rem; padding:1rem; background:#dcfce7; border-radius:8px; color:#166534; font-size:0.9rem;">
+            <button type="submit" id="submitBtn" class="btn btn-primary btn-lg" style="width:100%;">Send Message</button>
+
+            <div id="formSuccess" style="display:none; margin-top:1.25rem; padding:1rem 1.25rem; background:#dcfce7; border-radius:8px; color:#166534; font-size:0.9rem; line-height:1.5;">
               ✔ Thank you! Your message has been sent. Our team will respond within one business day.
+            </div>
+            <div id="formError" style="display:none; margin-top:1.25rem; padding:1rem 1.25rem; background:#fee2e2; border-radius:8px; color:#991b1b; font-size:0.9rem; line-height:1.5;">
+              ✖ <span id="formErrorText">Something went wrong. Please try again.</span>
             </div>
           </form>
         </div>
