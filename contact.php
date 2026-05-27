@@ -28,7 +28,7 @@ define('RECAPTCHA_SECRET',    getenv('RECAPTCHA_SECRET_KEY') ?: '6Lci5v4sAAAAAPX
 define('RECAPTCHA_MIN_SCORE', 0.5);   // 0.0 (bot) → 1.0 (human); 0.5 is Google's recommended default
 define('RECAPTCHA_ACTION',    'contact_submit');  // must match grecaptcha.execute() action in JS
 
-define('MAIL_TO',        'customerservice@starlight.com.np');
+define('MAIL_TO',        'ktmops@starlight.com.np,accounts@starlight.com.np');
 define('MAIL_FROM_ADDR', 'noreply@starlight.com.np');
 define('MAIL_FROM_NAME', 'Starlight Express Website Inquiry');
 
